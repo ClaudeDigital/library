@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Biblioteka e Qytetit</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh}
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:#1a1f2e}
+  ::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+  .playfair{font-family:'Playfair Display',serif}
+  .page{display:none}.page.active{display:block}
+  .admin-page{display:none}.admin-page.active{display:block}
+
+  /* Book spine animation */
+  .book-spine{
+    transform-origin:left center;
+    transition:transform 0.3s ease, box-shadow 0.3s ease;
+    cursor:pointer;
+  }
+  .book-spine:hover{
+    transform:translateX(8px) rotateY(-15deg);
+    box-shadow:-8px 4px 20px rgba(0,0,0,0.5);
+  }
+
+  /* Shelf glow */
+  .shelf{
+    background:linear-gradient(to bottom, #6B4226, #4a2f1a);
+    box-shadow:0 4px 8px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.1);
+  }
+
+  /* Cards */
+  .book-card{background:#1a1f2e;border:1px solid #2d3748;border-radius:12px;transition:all 0.2s;overflow:hidden}
+  .book-card:hover{border-color:#4f6ef7;transform:translateY(-2px);box-shadow:0 8px 24px rgba(79,110,247,0.15)}
+  .btn{padding:8px 16px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;border:none;display:inline-flex;align-items:center;gap:6px}
+  .btn-primary{background:#4f6ef7;color:#fff}.btn-primary:hover{background:#3b5bd9}
+  .btn-danger{background:#dc2626;color:#fff}.btn-danger:hover{background:#b91c1c}
+  .btn-success{background:#059669;color:#fff}.btn-success:hover{background:#047857}
+  .btn-outline{background:transparent;border:1px solid #374151;color:#9ca3af}.btn-outline:hover{border-color:#4f6ef7;color:#4f6ef7}
+  .btn-sm{padding:5px 10px;font-size:12px}
+  input,select,textarea{background:#1a1f2e;border:1px solid #374151;color:#e2e8f0;border-radius:8px;padding:8px 12px;font-size:14px;width:100%;outline:none;transition:border-color 0.2s}
+  input:focus,select:focus,textarea:focus{border-color:#4f6ef7}
+  textarea{resize:vertical;min-height:80px}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+  .modal{background:#1a1f2e;border:1px solid #2d3748;border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto}
+  .modal-lg{max-width:720px}
+  .status-aktiv{background:#05966920;color:#34d399;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
+  .status-kthyer{background:#1d4ed820;color:#60a5fa;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
+  .status-vonuar{background:#dc262620;color:#f87171;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
+  .stat-card{background:#1a1f2e;border:1px solid #2d3748;border-radius:12px;padding:20px}
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;padding:10px 12px;font-size:12px;font-weight:600;color:#6b7280;border-bottom:1px solid #2d3748;white-space:nowrap}
+  td{padding:10px 12px;font-size:14px;border-bottom:1px solid #1e2535;vertical-align:middle}
+  tr:hover td{background:#ffffff05}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:#0d1117;border-right:1px solid #2d3748;z-index:50;display:flex;flex-direction:column}
+  .sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 16px;color:#9ca3af;cursor:pointer;border-radius:8px;margin:2px 8px;font-size:14px;transition:all 0.15s}
+  .sidebar-link:hover,.sidebar-link.active{background:#4f6ef720;color:#4f6ef7}
+  .sidebar-link i{width:18px;height:18px}
+  .admin-content{margin-left:220px;padding:24px;min-height:100vh}
+  .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+  .badge-red{background:#dc262620;color:#f87171}
+  .badge-green{background:#05966920;color:#34d399}
+  .badge-blue{background:#1d4ed820;color:#60a5fa}
+  .badge-yellow{background:#d9770620;color:#fbbf24}
+  .toast{position:fixed;bottom:24px;right:24px;z-index:200;background:#1a1f2e;border:1px solid;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:500;opacity:0;transform:translateY(20px);transition:all 0.3s}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .toast.success{border-color:#059669;color:#34d399}
+  .toast.error{border-color:#dc2626;color:#f87171}
+  .hero-bg{background:linear-gradient(135deg,#0d1117 0%,#1a1f2e 50%,#0d1117 100%)}
+  .gold{color:#F5A623}
+  .public-nav{position:sticky;top:0;z-index:40;background:rgba(13,17,23,0.95);backdrop-filter:blur(10px);border-bottom:1px solid #2d3748}
+  .cover-mini{width:36px;height:48px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ PUBLIC SITE ════════════════════════ -->
+<div id="publicSite">
+
+  <!-- NAV -->
+  <nav class="public-nav">
+    <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:64px">
+      <div style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="showPublicPage('home')">
+        <div style="width:40px;height:40px;background:linear-gradient(135deg,#4f6ef7,#7c3aed);border-radius:10px;display:flex;align-items:center;justify-content:center">
+          <i data-lucide="book-open" style="width:22px;height:22px;color:#fff"></i>
+        </div>
+        <div>
+          <div class="playfair" style="font-size:18px;font-weight:700;color:#e2e8f0" id="navLibName">Biblioteka</div>
+          <div style="font-size:11px;color:#6b7280">e Qytetit</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <button onclick="showPublicPage('home')" id="nav-home" class="btn btn-outline">Ballina</button>
+        <button onclick="showPublicPage('history')" id="nav-history" class="btn btn-outline">Historia</button>
+        <button onclick="showPublicPage('contact')" id="nav-contact" class="btn btn-outline">Kontakti</button>
+        <button onclick="showAdmin()" class="btn" style="background:#ffffff10;color:#9ca3af;border:1px solid #374151;margin-left:8px">
+          <i data-lucide="settings" style="width:14px;height:14px"></i> Admin
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HOME PAGE -->
+  <div id="pub-home" class="page active">
+
+    <!-- HERO with bookshelf -->
+    <div class="hero-bg" style="padding:48px 20px 32px">
+      <div style="max-width:1200px;margin:0 auto">
+        <div style="text-align:center;margin-bottom:40px">
+          <h1 class="playfair" style="font-size:48px;font-weight:700;color:#e2e8f0;margin-bottom:12px">
+            Mirë se vini në <span style="background:linear-gradient(135deg,#4f6ef7,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Bibliotekë</span>
+          </h1>
+          <p style="font-size:18px;color:#9ca3af;max-width:600px;margin:0 auto" id="heroSubtext">Zbuloni botën e librave — koleksion i pasur për të gjithë lexuesit</p>
+        </div>
+
+        <!-- BOOKSHELF VISUAL -->
+        <div id="bookshelf" style="background:#111827;border-radius:16px;padding:20px 24px 0;overflow:hidden;position:relative;margin-bottom:40px">
+          <div style="display:flex;align-items:flex-end;gap:4px;height:140px;padding-bottom:0" id="shelfRow1"></div>
+          <div class="shelf" style="height:12px;margin:0 -24px"></div>
+          <div style="display:flex;align-items:flex-end;gap:4px;height:120px;padding-top:8px;padding-bottom:0" id="shelfRow2"></div>
+          <div class="shelf" style="height:12px;margin:0 -24px"></div>
+          <div style="padding:8px 0;text-align:center;color:#4b5563;font-size:12px">📚 Biblioteka jonë</div>
+        </div>
+
+        <!-- SEARCH BAR -->
+        <div style="background:#1a1f2e;border:1px solid #2d3748;border-radius:16px;padding:24px;max-width:700px;margin:0 auto">
+          <h3 style="font-size:18px;font-weight:600;margin-bottom:16px;text-align:center">
+            <i data-lucide="search" style="width:20px;height:20px;display:inline;vertical-align:middle;margin-right:8px;color:#4f6ef7"></i>
+            Kërko libra
+          </h3>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px">
+              <input id="pubSearchInput" type="text" placeholder="Titulli, autori, ISBN..." style="font-size:15px;padding:12px 16px"
+                onkeydown="if(event.key==='Enter')pubSearch()"/>
+            </div>
+            <button class="btn btn-primary" onclick="pubSearch()" style="padding:12px 24px;font-size:15px">
+              <i data-lucide="search" style="width:16px;height:16px"></i> Kërko
+            </button>
+          </div>
+          <div id="pubSearchResults" style="margin-top:16px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOST READ -->
+    <div style="max-width:1200px;margin:0 auto;padding:40px 20px 0">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+        <div style="width:4px;height:28px;background:linear-gradient(#4f6ef7,#7c3aed);border-radius:4px"></div>
+        <h2 class="playfair" style="font-size:26px;font-weight:700">Librat më të lexuar</h2>
+        <span class="badge badge-yellow" style="margin-left:8px">🔥 Popullarizuar</span>
+      </div>
+      <div id="mostReadGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px"></div>
+    </div>
+
+    <!-- LATEST BOOKS -->
+    <div style="max-width:1200px;margin:0 auto;padding:40px 20px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+        <div style="width:4px;height:28px;background:linear-gradient(#059669,#10b981);border-radius:4px"></div>
+        <h2 class="playfair" style="font-size:26px;font-weight:700">Librat e fundit</h2>
+        <span class="badge badge-green" style="margin-left:8px">✨ Të reja</span>
+      </div>
+      <div id="latestGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY PAGE -->
+  <div id="pub-history" class="page">
+    <div style="max-width:900px;margin:0 auto;padding:60px 20px">
+      <h1 class="playfair" style="font-size:42px;font-weight:700;margin-bottom:8px">Historia e Bibliotekës</h1>
+      <div style="width:60px;height:4px;background:linear-gradient(#4f6ef7,#7c3aed);border-radius:4px;margin-bottom:40px"></div>
+      <div id="historyContent" style="background:#1a1f2e;border:1px solid #2d3748;border-radius:16px;padding:40px">
+        <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:32px">
+          <div style="text-align:center;flex:1;min-width:120px">
+            <div style="font-size:40px;font-weight:700;color:#4f6ef7" id="histFounded">1960</div>
+            <div style="color:#6b7280;font-size:14px">Viti i themelimit</div>
+          </div>
+          <div style="text-align:center;flex:1;min-width:120px">
+            <div style="font-size:40px;font-weight:700;color:#7c3aed" id="histYears">65</div>
+            <div style="color:#6b7280;font-size:14px">Vjet shërbim</div>
+          </div>
+          <div style="text-align:center;flex:1;min-width:120px">
+            <div style="font-size:40px;font-weight:700;color:#059669" id="histBooks">—</div>
+            <div style="color:#6b7280;font-size:14px">Libra në koleksion</div>
+          </div>
+        </div>
+        <div style="border-top:1px solid #2d3748;padding-top:32px">
+          <p id="historyText" style="font-size:16px;line-height:1.8;color:#94a3b8"></p>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div style="margin-top:40px">
+        <h3 class="playfair" style="font-size:24px;font-weight:600;margin-bottom:24px">Kronologjia</h3>
+        <div style="position:relative;padding-left:32px;border-left:2px solid #2d3748">
+          <div style="margin-bottom:24px">
+            <div style="position:absolute;left:-9px;width:16px;height:16px;background:#4f6ef7;border-radius:50%;border:3px solid #0d1117"></div>
+            <div id="histFoundedYear" style="color:#4f6ef7;font-weight:600;font-size:14px">1960</div>
+            <div style="font-weight:500;margin:4px 0">Themelimi i Bibliotekës</div>
+            <div style="color:#6b7280;font-size:14px">Biblioteka u hap me koleksionin e parë të librave</div>
+          </div>
+          <div style="margin-bottom:24px">
+            <div style="position:absolute;left:-9px;width:16px;height:16px;background:#7c3aed;border-radius:50%;border:3px solid #0d1117"></div>
+            <div style="color:#7c3aed;font-weight:600;font-size:14px">2000</div>
+            <div style="font-weight:500;margin:4px 0">Modernizimi i Shërbimeve</div>
+            <div style="color:#6b7280;font-size:14px">Filloi dixhitalizimi i katalogut</div>
+          </div>
+          <div>
+            <div style="position:absolute;left:-9px;width:16px;height:16px;background:#059669;border-radius:50%;border:3px solid #0d1117"></div>
+            <div style="color:#059669;font-weight:600;font-size:14px">2025</div>
+            <div style="font-weight:500;margin:4px 0">Sistemi i Ri Dixhital</div>
+            <div style="color:#6b7280;font-size:14px">Platforma online për menaxhimin e librave</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT PAGE -->
+  <div id="pub-contact" class="page">
+    <div style="max-width:900px;margin:0 auto;padding:60px 20px">
+      <h1 class="playfair" style="font-size:42px;font-weight:700;margin-bottom:8px">Na Kontaktoni</h1>
+      <div style="width:60px;height:4px;background:linear-gradient(#4f6ef7,#7c3aed);border-radius:4px;margin-bottom:40px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px" id="contactCards">
+        <div class="stat-card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="width:44px;height:44px;background:#4f6ef720;border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <i data-lucide="map-pin" style="width:22px;height:22px;color:#4f6ef7"></i>
+            </div>
+            <div style="font-weight:600;font-size:16px">Adresa</div>
+          </div>
+          <div id="contactAddress" style="color:#94a3b8;line-height:1.6"></div>
+        </div>
+        <div class="stat-card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="width:44px;height:44px;background:#7c3aed20;border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <i data-lucide="phone" style="width:22px;height:22px;color:#7c3aed"></i>
+            </div>
+            <div style="font-weight:600;font-size:16px">Telefoni</div>
+          </div>
+          <div id="contactPhone" style="color:#94a3b8;line-height:1.6"></div>
+        </div>
+        <div class="stat-card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="width:44px;height:44px;background:#05966920;border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <i data-lucide="mail" style="width:22px;height:22px;color:#059669"></i>
+            </div>
+            <div style="font-weight:600;font-size:16px">Email</div>
+          </div>
+          <div id="contactEmail" style="color:#94a3b8;line-height:1.6"></div>
+        </div>
+        <div class="stat-card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="width:44px;height:44px;background:#d9770620;border-radius:10px;display:flex;align-items:center;justify-content:center">
+              <i data-lucide="clock" style="width:22px;height:22px;color:#f59e0b"></i>
+            </div>
+            <div style="font-weight:600;font-size:16px">Orari</div>
+          </div>
+          <div id="contactHours" style="color:#94a3b8;line-height:1.6;font-size:13px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end publicSite -->
+
+<!-- ═══════════════════════════════════ ADMIN SITE ════════════════════════ -->
+<div id="adminSite" style="display:none">
+
+  <!-- LOGIN -->
+  <div id="adminLogin" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div style="width:100%;max-width:400px">
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="width:64px;height:64px;background:linear-gradient(135deg,#4f6ef7,#7c3aed);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+          <i data-lucide="book-open" style="width:32px;height:32px;color:#fff"></i>
+        </div>
+        <h2 class="playfair" style="font-size:28px;font-weight:700">Paneli Admin</h2>
+        <p style="color:#6b7280;margin-top:4px">Biblioteka e Qytetit</p>
+      </div>
+      <div class="stat-card">
+        <div style="margin-bottom:16px">
+          <label style="font-size:13px;color:#9ca3af;display:block;margin-bottom:6px">Përdoruesi</label>
+          <input id="loginUser" type="text" placeholder="admin" value="admin"/>
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="font-size:13px;color:#9ca3af;display:block;margin-bottom:6px">Fjalëkalimi</label>
+          <input id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="doLogin()">
+          <i data-lucide="log-in" style="width:18px;height:18px"></i> Hyr
+        </button>
+        <div id="loginErr" style="color:#f87171;text-align:center;margin-top:12px;font-size:14px"></div>
+        <button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:12px" onclick="showPublicSite()">
+          ← Kthehu te faqja publike
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" style="display:none">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div style="padding:20px 16px;border-bottom:1px solid #1e2535">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#4f6ef7,#7c3aed);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i data-lucide="book-open" style="width:18px;height:18px;color:#fff"></i>
+          </div>
+          <div>
+            <div style="font-weight:600;font-size:14px" id="sidebarLibName">Biblioteka</div>
+            <div style="font-size:11px;color:#6b7280">Admin Panel</div>
+          </div>
+        </div>
+      </div>
+      <nav style="flex:1;padding:12px 0;overflow-y:auto">
+        <div class="sidebar-link active" onclick="showAdminPage('dashboard')" id="sl-dashboard">
+          <i data-lucide="layout-dashboard" style="width:18px;height:18px"></i> Dashboard
+        </div>
+        <div class="sidebar-link" onclick="showAdminPage('books')" id="sl-books">
+          <i data-lucide="book" style="width:18px;height:18px"></i> Librat
+        </div>
+        <div class="sidebar-link" onclick="showAdminPage('readers')" id="sl-readers">
+          <i data-lucide="users" style="width:18px;height:18px"></i> Lexuesit
+        </div>
+        <div class="sidebar-link" onclick="showAdminPage('borrowings')" id="sl-borrowings">
+          <i data-lucide="book-marked" style="width:18px;height:18px"></i> Huazimet
+        </div>
+        <div class="sidebar-link" onclick="showAdminPage('reports')" id="sl-reports">
+          <i data-lucide="bar-chart-3" style="width:18px;height:18px"></i> Raportet
+        </div>
+        <div class="sidebar-link" onclick="showAdminPage('settings')" id="sl-settings">
+          <i data-lucide="settings" style="width:18px;height:18px"></i> Cilësimet
+        </div>
+        <div style="border-top:1px solid #1e2535;margin:12px 8px"></div>
+        <div class="sidebar-link" onclick="showPublicSite()">
+          <i data-lucide="globe" style="width:18px;height:18px"></i> Faqja Publike
+        </div>
+        <div class="sidebar-link" onclick="doLogout()">
+          <i data-lucide="log-out" style="width:18px;height:18px"></i> Dil
+        </div>
+      </nav>
+    </div>
+
+    <!-- Content -->
+    <div class="admin-content">
+
+      <!-- DASHBOARD -->
+      <div id="ap-dashboard" class="admin-page active">
+        <h1 class="playfair" style="font-size:28px;font-weight:700;margin-bottom:24px">Dashboard</h1>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:32px" id="dashStats"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" id="dashTables">
+          <div class="stat-card">
+            <h3 style="font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+              <i data-lucide="clock" style="width:18px;height:18px;color:#4f6ef7"></i> Huazimet e fundit
+            </h3>
+            <div id="recentBorrowingsTable"></div>
+          </div>
+          <div class="stat-card">
+            <h3 style="font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+              <i data-lucide="alert-triangle" style="width:18px;height:18px;color:#f87171"></i> Të vonuara
+              <span class="badge badge-red" id="overdueCount">0</span>
+            </h3>
+            <div id="overdueTable"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOOKS -->
+      <div id="ap-books" class="admin-page">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+          <h1 class="playfair" style="font-size:28px;font-weight:700">Librat</h1>
+          <button class="btn btn-primary" onclick="openBookModal()">
+            <i data-lucide="plus" style="width:16px;height:16px"></i> Shto Libër
+          </button>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px"><input id="bookSearch" type="text" placeholder="Kërko titull, autor, ISBN..." oninput="loadBooks()"/></div>
+          <select id="bookCatFilter" onchange="loadBooks()" style="min-width:160px"><option value="">Të gjitha kategoritë</option></select>
+          <select id="bookAuthorFilter" onchange="loadBooks()" style="min-width:160px"><option value="">Të gjithë autorët</option></select>
+          <select id="bookAvailFilter" onchange="loadBooks()" style="min-width:160px">
+            <option value="">Të gjitha</option>
+            <option value="1">Disponueshme</option>
+          </select>
+        </div>
+        <div class="stat-card table-wrap">
+          <table>
+            <thead><tr>
+              <th>Libri</th><th>ISBN</th><th>Kategoria</th><th>Viti</th><th>Kopjet</th><th>Disponueshme</th><th>Lexuar</th><th>Veprimet</th>
+            </tr></thead>
+            <tbody id="booksTable"></tbody>
+          </table>
+          <div id="booksPager" style="padding:12px;text-align:center;color:#6b7280;font-size:13px"></div>
+        </div>
+      </div>
+
+      <!-- READERS -->
+      <div id="ap-readers" class="admin-page">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+          <h1 class="playfair" style="font-size:28px;font-weight:700">Lexuesit</h1>
+          <button class="btn btn-primary" onclick="openReaderModal()">
+            <i data-lucide="user-plus" style="width:16px;height:16px"></i> Shto Lexues
+          </button>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px"><input id="readerSearch" type="text" placeholder="Emri, mbiemri, ID..." oninput="loadReaders()"/></div>
+          <select id="readerStatusFilter" onchange="loadReaders()" style="min-width:160px">
+            <option value="">Të gjithë</option>
+            <option value="aktiv">Aktivë</option>
+            <option value="pasiv">Pasivë</option>
+          </select>
+        </div>
+        <div class="stat-card table-wrap">
+          <table>
+            <thead><tr>
+              <th>Lexuesi</th><th>ID Personale</th><th>Telefoni</th><th>Anëtari që</th><th>Statusi</th><th>Libra aktiv</th><th>Total huazuar</th><th>Veprimet</th>
+            </tr></thead>
+            <tbody id="readersTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BORROWINGS -->
+      <div id="ap-borrowings" class="admin-page">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+          <h1 class="playfair" style="font-size:28px;font-weight:700">Huazimet</h1>
+          <button class="btn btn-primary" onclick="openBorrowModal()">
+            <i data-lucide="book-plus" style="width:16px;height:16px"></i> Jep Libër
+          </button>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <select id="borrowStatusFilter" onchange="loadBorrowings()" style="min-width:160px">
+            <option value="">Të gjitha</option>
+            <option value="aktiv">Aktive</option>
+            <option value="kthyer">Të kthyera</option>
+          </select>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:#f87171;font-size:14px">
+            <input type="checkbox" id="overdueFilter" onchange="loadBorrowings()" style="width:auto"/>
+            Vetëm të vonuara
+          </label>
+        </div>
+        <div class="stat-card table-wrap">
+          <table>
+            <thead><tr>
+              <th>Lexuesi</th><th>Libri</th><th>Data e dhënies</th><th>Data e kthimit</th><th>U kthye</th><th>Statusi</th><th>Veprimet</th>
+            </tr></thead>
+            <tbody id="borrowingsTable"></tbody>
+          </table>
+          <div id="borrowingsPager" style="padding:12px;text-align:center;color:#6b7280;font-size:13px"></div>
+        </div>
+      </div>
+
+      <!-- REPORTS -->
+      <div id="ap-reports" class="admin-page">
+        <h1 class="playfair" style="font-size:28px;font-weight:700;margin-bottom:24px">Raportet</h1>
+
+        <!-- Reader of month/year -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px">
+          <div class="stat-card" style="border:2px solid #4f6ef730">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+              <div style="font-size:32px">🏆</div>
+              <div>
+                <div style="font-weight:700;font-size:16px">Lexuesi i Muajit</div>
+                <div style="color:#6b7280;font-size:13px" id="romPeriod"></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-bottom:16px">
+              <select id="romMonth" style="flex:1" onchange="loadReaderOfMonth()">
+                <option value="01">Janar</option><option value="02">Shkurt</option><option value="03">Mars</option>
+                <option value="04">Prill</option><option value="05">Maj</option><option value="06">Qershor</option>
+                <option value="07">Korrik</option><option value="08">Gusht</option><option value="09">Shtator</option>
+                <option value="10">Tetor</option><option value="11">Nëntor</option><option value="12">Dhjetor</option>
+              </select>
+              <select id="romYear" style="flex:1" onchange="loadReaderOfMonth()"></select>
+            </div>
+            <div id="readerOfMonthCard"></div>
+          </div>
+
+          <div class="stat-card" style="border:2px solid #7c3aed30">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+              <div style="font-size:32px">👑</div>
+              <div>
+                <div style="font-weight:700;font-size:16px">Lexuesi i Vitit</div>
+                <div style="color:#6b7280;font-size:13px" id="royPeriod"></div>
+              </div>
+            </div>
+            <select id="royYear" style="width:100%;margin-bottom:16px" onchange="loadReaderOfYear()"></select>
+            <div id="readerOfYearCard"></div>
+          </div>
+        </div>
+
+        <!-- Top readers -->
+        <div class="stat-card" style="margin-bottom:24px">
+          <h3 style="font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+            <i data-lucide="trophy" style="width:18px;height:18px;color:#f59e0b"></i>
+            Top 10 Lexues Sivjet
+          </h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Lexuesi</th><th>Libra të huazuar</th></tr></thead>
+              <tbody id="topReadersTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Monthly chart -->
+        <div class="stat-card">
+          <h3 style="font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+            <i data-lucide="bar-chart-2" style="width:18px;height:18px;color:#4f6ef7"></i>
+            Huazimet sipas muajit — <select id="chartYear" onchange="loadMonthlyChart()" style="margin-left:4px;width:auto;padding:4px 8px"></select>
+          </h3>
+          <div id="monthlyChart" style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:8px 0"></div>
+          <div style="display:flex;gap:8px;margin-top:4px" id="monthlyLabels"></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="ap-settings" class="admin-page">
+        <h1 class="playfair" style="font-size:28px;font-weight:700;margin-bottom:24px">Cilësimet</h1>
+        <div class="stat-card" style="max-width:600px">
+          <h3 style="font-weight:600;margin-bottom:20px">Informacionet e Bibliotekës</h3>
+          <div style="display:grid;gap:16px">
+            <div><label style="font-size:13px;color:#9ca3af;display:block;margin-bottom:6px">Emri i Bibliotekës</label><input id="setLibName" type="text"/></div>
+            <div><label style="font-size:13px;color:#9ca3af;display:block;margin-bottom:6px">Adresa</label><input id="setLibAddress" type="text"/></div>
+            <div><label style="font-size:13px;color:#9ca3af;display:block;margin-bottom:6px">Telefoni</label><input id="setLibPhone" type="text"/></div>
+            <div><label style="font-size:13px;color:#9ca3af;display:block;margin-bottom:6px">Email</label><input id="setLibEmail" type="text"/></div>
+            <div><label style="font-size:13px;color:#9ca3af;display:block;margin-bottom:6px">Orari</label><input id="setLibHours" type="text"/></div>
+            <div><label style="font-size:13px;color:#9ca3af;display:block;margin-bottom:6px">Viti i Themelimit</label><input id="setLibFounded" type="number"/></div>
+            <div><label style="font-size:13px;color:#9ca3af;display:block;margin-bottom:6px">Ditë huazimi (default: 14)</label><input id="setBorrowDays" type="number" min="1" max="365"/></div>
+            <div><label style="font-size:13px;color:#9ca3af;display:block;margin-bottom:6px">Historia e Bibliotekës</label><textarea id="setLibHistory" rows="4"></textarea></div>
+            <button class="btn btn-primary" onclick="saveSettings()">
+              <i data-lucide="save" style="width:16px;height:16px"></i> Ruaj Ndryshimet
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end admin-content -->
+  </div><!-- end adminPanel -->
+
+</div><!-- end adminSite -->
+
+<!-- ═══ MODALS ═══════════════════════════════════════════════════════════════ -->
+
+<!-- Book Modal -->
+<div id="bookModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeModal('bookModal')">
+  <div class="modal">
+    <div style="padding:24px;border-bottom:1px solid #2d3748;display:flex;justify-content:space-between;align-items:center">
+      <h3 class="playfair" style="font-size:20px;font-weight:700" id="bookModalTitle">Shto Libër</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('bookModal')">✕</button>
+    </div>
+    <div style="padding:24px;display:grid;gap:14px">
+      <input type="hidden" id="bookId"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Titulli *</label><input id="bookTitle" type="text" placeholder="Titulli i librit"/></div>
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Autori *</label><input id="bookAuthor" type="text" placeholder="Emri i autorit"/></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">ISBN</label><input id="bookISBN" type="text" placeholder="978-..."/></div>
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Kategoria</label>
+          <select id="bookCat">
+            <option>E Përgjithshme</option><option>Letërsi Shqipe</option><option>Letërsi Botërore</option>
+            <option>Histori</option><option>Shkencë</option><option>Filozofi</option><option>Art</option>
+            <option>Gjuhësi</option><option>Fëmijëve</option><option>Tjetër</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Shtëpia botuese</label><input id="bookPublisher" type="text"/></div>
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Viti</label><input id="bookYear" type="number" placeholder="2024"/></div>
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Kopje</label><input id="bookCopies" type="number" min="1" value="1"/></div>
+      </div>
+      <div>
+        <label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Ngjyra e kopertinës</label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap" id="colorPicker">
+          <div onclick="selectColor('#1E40AF')" style="width:32px;height:32px;background:#1E40AF;border-radius:6px;cursor:pointer" title="Blu"></div>
+          <div onclick="selectColor('#7C3AED')" style="width:32px;height:32px;background:#7C3AED;border-radius:6px;cursor:pointer" title="Vjollcë"></div>
+          <div onclick="selectColor('#059669')" style="width:32px;height:32px;background:#059669;border-radius:6px;cursor:pointer" title="Jeshile"></div>
+          <div onclick="selectColor('#DC2626')" style="width:32px;height:32px;background:#DC2626;border-radius:6px;cursor:pointer" title="Kuqe"></div>
+          <div onclick="selectColor('#D97706')" style="width:32px;height:32px;background:#D97706;border-radius:6px;cursor:pointer" title="Portokalli"></div>
+          <div onclick="selectColor('#0F766E')" style="width:32px;height:32px;background:#0F766E;border-radius:6px;cursor:pointer" title="Jeshile e errët"></div>
+          <div onclick="selectColor('#9333EA')" style="width:32px;height:32px;background:#9333EA;border-radius:6px;cursor:pointer" title="Vjollcë e ndezur"></div>
+          <div onclick="selectColor('#C2410C')" style="width:32px;height:32px;background:#C2410C;border-radius:6px;cursor:pointer" title="Portokalli i errët"></div>
+          <div onclick="selectColor('#1D4ED8')" style="width:32px;height:32px;background:#1D4ED8;border-radius:6px;cursor:pointer" title="Blu e ndezur"></div>
+          <div onclick="selectColor('#7C2D12')" style="width:32px;height:32px;background:#7C2D12;border-radius:6px;cursor:pointer" title="Kafe"></div>
+          <input type="color" id="bookColor" value="#1E40AF" style="width:32px;height:32px;padding:0;border:none;background:none;cursor:pointer" onchange="this.dataset.custom='1'" title="Ngjyrë tjetër"/>
+        </div>
+      </div>
+      <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Përshkrimi</label><textarea id="bookDesc" rows="2" placeholder="Përshkrim i shkurtër..."></textarea></div>
+    </div>
+    <div style="padding:16px 24px;border-top:1px solid #2d3748;display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="closeModal('bookModal')">Anulo</button>
+      <button class="btn btn-primary" onclick="saveBook()">
+        <i data-lucide="save" style="width:14px;height:14px"></i> Ruaj
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Reader Modal -->
+<div id="readerModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeModal('readerModal')">
+  <div class="modal">
+    <div style="padding:24px;border-bottom:1px solid #2d3748;display:flex;justify-content:space-between;align-items:center">
+      <h3 class="playfair" style="font-size:20px;font-weight:700" id="readerModalTitle">Shto Lexues</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('readerModal')">✕</button>
+    </div>
+    <div style="padding:24px;display:grid;gap:14px">
+      <input type="hidden" id="readerId"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Emri *</label><input id="readerName" type="text"/></div>
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Mbiemri *</label><input id="readerSurname" type="text"/></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">ID Personale</label><input id="readerPID" type="text" placeholder="XXXXXXXXXX"/></div>
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Telefoni</label><input id="readerPhone" type="text" placeholder="+383 4X XXX XXX"/></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Email</label><input id="readerEmail" type="email"/></div>
+        <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Datëlindja</label><input id="readerBirthday" type="date"/></div>
+      </div>
+      <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Adresa</label><input id="readerAddress" type="text"/></div>
+      <div id="readerStatusRow" style="display:none">
+        <label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Statusi</label>
+        <select id="readerStatus"><option value="aktiv">Aktiv</option><option value="pasiv">Pasiv</option></select>
+      </div>
+      <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px">Shënime</label><textarea id="readerNotes" rows="2"></textarea></div>
+    </div>
+    <div style="padding:16px 24px;border-top:1px solid #2d3748;display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="closeModal('readerModal')">Anulo</button>
+      <button class="btn btn-primary" onclick="saveReader()">
+        <i data-lucide="save" style="width:14px;height:14px"></i> Ruaj
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Borrow Modal -->
+<div id="borrowModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeModal('borrowModal')">
+  <div class="modal">
+    <div style="padding:24px;border-bottom:1px solid #2d3748;display:flex;justify-content:space-between;align-items:center">
+      <h3 class="playfair" style="font-size:20px;font-weight:700">Jep Libër</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('borrowModal')">✕</button>
+    </div>
+    <div style="padding:24px;display:grid;gap:16px">
+      <div>
+        <label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:6px">Lexuesi *</label>
+        <input id="borrowReaderSearch" type="text" placeholder="Kërko lexuesin (emri, mbiemri)..." oninput="searchBorrowReader()"/>
+        <div id="borrowReaderList" style="background:#111827;border:1px solid #374151;border-radius:8px;margin-top:4px;display:none;max-height:160px;overflow-y:auto"></div>
+        <div id="borrowReaderSelected" style="display:none;background:#4f6ef720;border:1px solid #4f6ef7;border-radius:8px;padding:10px;margin-top:8px"></div>
+        <input type="hidden" id="borrowReaderId"/>
+      </div>
+      <div>
+        <label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:6px">Libri *</label>
+        <input id="borrowBookSearch" type="text" placeholder="Kërko librin (titulli, ISBN)..." oninput="searchBorrowBook()"/>
+        <div id="borrowBookList" style="background:#111827;border:1px solid #374151;border-radius:8px;margin-top:4px;display:none;max-height:160px;overflow-y:auto"></div>
+        <div id="borrowBookSelected" style="display:none;background:#05966920;border:1px solid #059669;border-radius:8px;padding:10px;margin-top:8px"></div>
+        <input type="hidden" id="borrowBookId"/>
+      </div>
+      <div><label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:6px">Shënime</label><textarea id="borrowNotes" rows="2"></textarea></div>
+    </div>
+    <div style="padding:16px 24px;border-top:1px solid #2d3748;display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="closeModal('borrowModal')">Anulo</button>
+      <button class="btn btn-success" onclick="saveBorrowing()">
+        <i data-lucide="book-plus" style="width:14px;height:14px"></i> Jep Librin
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Reader Detail Modal -->
+<div id="readerDetailModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeModal('readerDetailModal')">
+  <div class="modal modal-lg">
+    <div style="padding:24px;border-bottom:1px solid #2d3748;display:flex;justify-content:space-between;align-items:center">
+      <h3 class="playfair" style="font-size:20px;font-weight:700" id="readerDetailName"></h3>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('readerDetailModal')">✕</button>
+    </div>
+    <div id="readerDetailContent" style="padding:24px;max-height:70vh;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- Book Detail Modal -->
+<div id="bookDetailModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeModal('bookDetailModal')">
+  <div class="modal modal-lg">
+    <div style="padding:24px;border-bottom:1px solid #2d3748;display:flex;justify-content:space-between;align-items:center">
+      <h3 class="playfair" style="font-size:20px;font-weight:700" id="bookDetailTitle"></h3>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('bookDetailModal')">✕</button>
+    </div>
+    <div id="bookDetailContent" style="padding:24px;max-height:70vh;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script>
+const API = '';
+let token = localStorage.getItem('lib_token');
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error || 'Gabim');
+  return d;
+}
+
+function toast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function fmtDate(d) { return d ? d.split('T')[0].split('-').reverse().join('.') : '—'; }
+
+function isOverdue(dateDue, status) {
+  if (status !== 'aktiv') return false;
+  return new Date(dateDue) < new Date(new Date().toDateString());
+}
+
+function closeModal(id) { document.getElementById(id).style.display='none'; }
+
+function initLucide() { if(window.lucide) lucide.createIcons(); }
+
+// ─── PUBLIC SITE ─────────────────────────────────────────────────────────────
+let settings = {};
+
+async function loadPublicSite() {
+  try {
+    settings = await api('GET', '/api/settings');
+    document.getElementById('navLibName').textContent = settings.library_name || 'Biblioteka';
+    document.title = settings.library_name || 'Biblioteka e Qytetit';
+    loadBookshelf();
+    loadMostRead();
+    loadLatest();
+    loadContactInfo();
+    loadHistoryInfo();
+  } catch(e) {}
+}
+
+async function loadBookshelf() {
+  try {
+    const { books } = await api('GET', '/api/books?limit=30');
+    const colors = books.map(b=>b.cover_color || '#3B82F6');
+    const allColors = [...colors];
+    while(allColors.length < 28) allColors.push(...colors.slice(0, 28 - allColors.length));
+
+    const heights1 = [110,130,120,140,115,125,135,108,120,130,125,140,115,120];
+    const heights2 = [100,120,110,130,105,115,125,100,115,120,115,130,105,110];
+
+    const row1 = document.getElementById('shelfRow1');
+    const row2 = document.getElementById('shelfRow2');
+    row1.innerHTML = '';
+    row2.innerHTML = '';
+
+    const titles = books.map(b=>b.title);
+    for(let i=0; i<14; i++) {
+      const h = heights1[i] || 120;
+      const c = allColors[i] || '#3B82F6';
+      const t = titles[i] || '';
+      row1.innerHTML += `<div class="book-spine" style="background:${c};width:28px;height:${h}px;border-radius:3px 6px 6px 3px;writing-mode:vertical-rl;text-orientation:mixed;font-size:9px;color:rgba(255,255,255,0.7);overflow:hidden;padding:4px 2px;display:flex;align-items:center;box-shadow:3px 0 6px rgba(0,0,0,0.4)" title="${t}">${t.substring(0,20)}</div>`;
+    }
+    for(let i=14; i<28; i++) {
+      const h = heights2[i-14] || 110;
+      const c = allColors[i] || '#3B82F6';
+      const t = titles[i] || '';
+      row2.innerHTML += `<div class="book-spine" style="background:${c};width:26px;height:${h}px;border-radius:3px 6px 6px 3px;writing-mode:vertical-rl;text-orientation:mixed;font-size:8px;color:rgba(255,255,255,0.7);overflow:hidden;padding:4px 2px;display:flex;align-items:center;box-shadow:3px 0 6px rgba(0,0,0,0.4)" title="${t}">${t.substring(0,18)}</div>`;
+    }
+    initLucide();
+  } catch(e) {}
+}
+
+async function loadMostRead() {
+  try {
+    const books = await api('GET', '/api/books/most-read');
+    const grid = document.getElementById('mostReadGrid');
+    grid.innerHTML = books.map((b,i) => `
+      <div class="book-card" style="padding:16px">
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+          <div style="width:48px;height:64px;background:${b.cover_color || '#3B82F6'};border-radius:5px;flex-shrink:0;display:flex;align-items:flex-end;padding:4px 3px">
+            <span style="font-size:9px;color:rgba(255,255,255,0.7);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical">${b.title}</span>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:14px;margin-bottom:3px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${b.title}</div>
+            <div style="color:#9ca3af;font-size:12px">${b.author}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:11px;color:#6b7280">${b.category}</span>
+          <span class="badge badge-yellow">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)} · ${b.times_borrowed} herë</span>
+        </div>
+        <div style="margin-top:8px">
+          ${b.copies_available > 0
+            ? `<span class="badge badge-green">✓ Disponueshëm (${b.copies_available})</span>`
+            : `<span class="badge badge-red">✗ I zënë</span>`}
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {}
+}
+
+async function loadLatest() {
+  try {
+    const books = await api('GET', '/api/books/latest');
+    const grid = document.getElementById('latestGrid');
+    grid.innerHTML = books.map(b => `
+      <div class="book-card" style="padding:16px">
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+          <div style="width:48px;height:64px;background:${b.cover_color || '#3B82F6'};border-radius:5px;flex-shrink:0;display:flex;align-items:flex-end;padding:4px 3px">
+            <span style="font-size:9px;color:rgba(255,255,255,0.7);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical">${b.title}</span>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:14px;margin-bottom:3px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${b.title}</div>
+            <div style="color:#9ca3af;font-size:12px">${b.author}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:11px;color:#6b7280">${b.category}</span>
+          ${b.copies_available > 0
+            ? `<span class="badge badge-green">Disponueshëm</span>`
+            : `<span class="badge badge-red">I zënë</span>`}
+        </div>
+        ${b.isbn ? `<div style="font-size:11px;color:#4b5563;margin-top:6px">ISBN: ${b.isbn}</div>` : ''}
+      </div>
+    `).join('');
+  } catch(e) {}
+}
+
+async function pubSearch() {
+  const q = document.getElementById('pubSearchInput').value.trim();
+  if (!q) return;
+  try {
+    const { books } = await api('GET', `/api/books?search=${encodeURIComponent(q)}&limit=20`);
+    const el = document.getElementById('pubSearchResults');
+    if (!books.length) { el.innerHTML = '<div style="text-align:center;color:#6b7280;padding:12px">Nuk u gjet asnjë libër.</div>'; return; }
+    el.innerHTML = `<div style="font-size:13px;color:#6b7280;margin-bottom:10px">${books.length} libra gjetur</div>` +
+      books.map(b => `
+        <div style="display:flex;gap:12px;align-items:center;padding:10px;background:#111827;border-radius:8px;margin-bottom:8px">
+          <div style="width:36px;height:48px;background:${b.cover_color||'#3B82F6'};border-radius:4px;flex-shrink:0"></div>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:14px">${b.title}</div>
+            <div style="color:#9ca3af;font-size:12px">${b.author} · ${b.category}</div>
+            ${b.isbn ? `<div style="color:#4b5563;font-size:11px">ISBN: ${b.isbn}</div>` : ''}
+          </div>
+          <div>${b.copies_available > 0 ? '<span class="badge badge-green">✓ Disponueshëm</span>' : '<span class="badge badge-red">✗ I zënë</span>'}</div>
+        </div>
+      `).join('');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function loadContactInfo() {
+  document.getElementById('contactAddress').textContent = settings.library_address || '—';
+  document.getElementById('contactPhone').textContent = settings.library_phone || '—';
+  document.getElementById('contactEmail').textContent = settings.library_email || '—';
+  document.getElementById('contactHours').innerHTML = (settings.library_hours || '').replace(' | ', '<br>');
+}
+
+async function loadHistoryInfo() {
+  document.getElementById('historyText').textContent = settings.library_history || '';
+  const founded = parseInt(settings.library_founded || 1960);
+  const years = new Date().getFullYear() - founded;
+  document.getElementById('histFounded').textContent = founded;
+  document.getElementById('histYears').textContent = years;
+  document.getElementById('histFoundedYear').textContent = founded;
+  document.getElementById('histFoundedYear').closest('div').querySelector('div:nth-child(2)').textContent = `Themelimi i Bibliotekës`;
+  try {
+    const { books } = await api('GET', '/api/books?limit=1');
+    // get total count from header or separate call
+    const r2 = await api('GET', '/api/books?limit=1');
+  } catch(e) {}
+}
+
+function showPublicPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pub-'+name).classList.add('active');
+  ['home','history','contact'].forEach(n => {
+    document.getElementById('nav-'+n)?.classList.toggle('active', n===name);
+  });
+  if(name==='history') loadHistoryInfo();
+}
+
+// ─── ADMIN ───────────────────────────────────────────────────────────────────
+function showPublicSite() {
+  document.getElementById('adminSite').style.display='none';
+  document.getElementById('publicSite').style.display='block';
+  loadPublicSite();
+  initLucide();
+}
+
+function showAdmin() {
+  document.getElementById('publicSite').style.display='none';
+  document.getElementById('adminSite').style.display='block';
+  if (token) { showAdminPanel(); }
+  initLucide();
+}
+
+function showAdminPanel() {
+  document.getElementById('adminLogin').style.display='none';
+  document.getElementById('adminPanel').style.display='block';
+  showAdminPage('dashboard');
+  loadAdminSettings();
+}
+
+async function doLogin() {
+  const username = document.getElementById('loginUser').value;
+  const password = document.getElementById('loginPass').value;
+  try {
+    const d = await api('POST', '/api/auth/login', { username, password });
+    token = d.token;
+    localStorage.setItem('lib_token', token);
+    showAdminPanel();
+  } catch(e) {
+    document.getElementById('loginErr').textContent = e.message;
+  }
+}
+
+function doLogout() {
+  token = null;
+  localStorage.removeItem('lib_token');
+  document.getElementById('adminPanel').style.display='none';
+  document.getElementById('adminLogin').style.display='flex';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginErr').textContent='';
+}
+
+function showAdminPage(name) {
+  document.querySelectorAll('.admin-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('ap-'+name).classList.add('active');
+  document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('sl-'+name)?.classList.add('active');
+  if(name==='dashboard') loadDashboard();
+  else if(name==='books') { loadBooks(); loadBookFilters(); }
+  else if(name==='readers') loadReaders();
+  else if(name==='borrowings') loadBorrowings();
+  else if(name==='reports') loadReports();
+  else if(name==='settings') loadSettingsForm();
+  setTimeout(initLucide, 100);
+}
+
+async function loadAdminSettings() {
+  try {
+    settings = await api('GET', '/api/settings');
+    document.getElementById('sidebarLibName').textContent = settings.library_name || 'Biblioteka';
+  } catch(e) {}
+}
+
+// DASHBOARD
+async function loadDashboard() {
+  try {
+    const d = await api('GET', '/api/stats/dashboard');
+    document.getElementById('dashStats').innerHTML = `
+      <div class="stat-card" style="border-left:4px solid #4f6ef7">
+        <div style="font-size:32px;font-weight:700;color:#4f6ef7">${d.totalBooks}</div>
+        <div style="color:#9ca3af;margin-top:4px;font-size:14px">Libra gjithsej</div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid #7c3aed">
+        <div style="font-size:32px;font-weight:700;color:#7c3aed">${d.totalReaders}</div>
+        <div style="color:#9ca3af;margin-top:4px;font-size:14px">Lexues aktivë</div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid #059669">
+        <div style="font-size:32px;font-weight:700;color:#059669">${d.activeBorrowings}</div>
+        <div style="color:#9ca3af;margin-top:4px;font-size:14px">Libra jashtë</div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid #dc2626">
+        <div style="font-size:32px;font-weight:700;color:#dc2626">${d.overdue}</div>
+        <div style="color:#9ca3af;margin-top:4px;font-size:14px">Të vonuara</div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid #d97706">
+        <div style="font-size:32px;font-weight:700;color:#d97706">${d.returnedThisMonth}</div>
+        <div style="color:#9ca3af;margin-top:4px;font-size:14px">Kthyer këtë muaj</div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid #0891b2">
+        <div style="font-size:32px;font-weight:700;color:#0891b2">${d.newBooksThisMonth}</div>
+        <div style="color:#9ca3af;margin-top:4px;font-size:14px">Libra të reja këtë muaj</div>
+      </div>
+    `;
+    document.getElementById('overdueCount').textContent = d.overdue;
+    document.getElementById('recentBorrowingsTable').innerHTML = d.recentBorrowings.length ?
+      d.recentBorrowings.map(b=>`
+        <div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #1e2535">
+          <div class="cover-mini" style="background:${b.cover_color||'#3B82F6'}">${b.book_title.substring(0,2)}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${b.book_title}</div>
+            <div style="font-size:12px;color:#6b7280">${b.reader_name}</div>
+          </div>
+          <div style="font-size:11px;color:#6b7280">${fmtDate(b.date_given)}</div>
+        </div>
+      `).join('') : '<div style="color:#6b7280;font-size:14px;padding:8px">Asnjë huazim.</div>';
+
+    document.getElementById('overdueTable').innerHTML = d.overdueList.length ?
+      d.overdueList.map(b=>`
+        <div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #1e2535">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500">${b.book_title}</div>
+            <div style="font-size:12px;color:#6b7280">${b.reader_name} · ${b.reader_phone||''}</div>
+          </div>
+          <div style="font-size:11px;color:#f87171">kthej deri ${fmtDate(b.date_due)}</div>
+        </div>
+      `).join('') : '<div style="color:#6b7280;font-size:14px;padding:8px">Asnjë libër i vonuar. 🎉</div>';
+    initLucide();
+  } catch(e) {}
+}
+
+// BOOKS
+let booksOffset = 0;
+async function loadBooks() {
+  const search = document.getElementById('bookSearch')?.value || '';
+  const cat = document.getElementById('bookCatFilter')?.value || '';
+  const author = document.getElementById('bookAuthorFilter')?.value || '';
+  const avail = document.getElementById('bookAvailFilter')?.value || '';
+  try {
+    const d = await api('GET', `/api/books?search=${encodeURIComponent(search)}&category=${encodeURIComponent(cat)}&author=${encodeURIComponent(author)}&available=${avail}&limit=30&offset=${booksOffset}`);
+    const tb = document.getElementById('booksTable');
+    tb.innerHTML = d.books.map(b=>`
+      <tr>
+        <td>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="cover-mini" style="background:${b.cover_color||'#3B82F6'}">${b.title.substring(0,2)}</div>
+            <div>
+              <div style="font-weight:500;font-size:14px">${b.title}</div>
+              <div style="color:#9ca3af;font-size:12px">${b.author}</div>
+            </div>
+          </div>
+        </td>
+        <td style="color:#6b7280;font-size:12px">${b.isbn||'—'}</td>
+        <td><span class="badge badge-blue">${b.category}</span></td>
+        <td style="color:#9ca3af">${b.year_published||'—'}</td>
+        <td style="text-align:center">${b.copies_total}</td>
+        <td style="text-align:center">
+          ${b.copies_available > 0
+            ? `<span class="badge badge-green">${b.copies_available}</span>`
+            : `<span class="badge badge-red">0</span>`}
+        </td>
+        <td style="text-align:center"><span class="badge badge-yellow">${b.times_borrowed}</span></td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-outline btn-sm" onclick="viewBook(${b.id})" title="Detajet">
+              <i data-lucide="eye" style="width:13px;height:13px"></i>
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="editBook(${b.id})" title="Edito">
+              <i data-lucide="edit-2" style="width:13px;height:13px"></i>
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deleteBook(${b.id})" title="Fshi">
+              <i data-lucide="trash-2" style="width:13px;height:13px"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+    document.getElementById('booksPager').textContent = `${d.books.length} nga ${d.total} libra`;
+    initLucide();
+  } catch(e) {}
+}
+
+async function loadBookFilters() {
+  try {
+    const [cats, authors] = await Promise.all([
+      api('GET', '/api/books/categories'),
+      api('GET', '/api/books/authors'),
+    ]);
+    const catSel = document.getElementById('bookCatFilter');
+    const authorSel = document.getElementById('bookAuthorFilter');
+    catSel.innerHTML = '<option value="">Të gjitha kategoritë</option>' + cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+    authorSel.innerHTML = '<option value="">Të gjithë autorët</option>' + authors.map(a=>`<option value="${a}">${a}</option>`).join('');
+  } catch(e) {}
+}
+
+let selectedBookColor = '#1E40AF';
+function selectColor(c) {
+  selectedBookColor = c;
+  document.getElementById('bookColor').value = c;
+  document.querySelectorAll('#colorPicker div').forEach(d=>d.style.outline='');
+  event.target.style.outline = '3px solid #fff';
+}
+
+function openBookModal(book=null) {
+  document.getElementById('bookId').value = '';
+  document.getElementById('bookTitle').value = '';
+  document.getElementById('bookAuthor').value = '';
+  document.getElementById('bookISBN').value = '';
+  document.getElementById('bookCat').value = 'E Përgjithshme';
+  document.getElementById('bookPublisher').value = '';
+  document.getElementById('bookYear').value = '';
+  document.getElementById('bookCopies').value = 1;
+  document.getElementById('bookColor').value = '#1E40AF';
+  document.getElementById('bookDesc').value = '';
+  selectedBookColor = '#1E40AF';
+  document.getElementById('bookModalTitle').textContent = 'Shto Libër';
+  document.getElementById('bookModal').style.display='flex';
+  if(book) {
+    document.getElementById('bookModalTitle').textContent = 'Edito Librin';
+    document.getElementById('bookId').value = book.id;
+    document.getElementById('bookTitle').value = book.title;
+    document.getElementById('bookAuthor').value = book.author;
+    document.getElementById('bookISBN').value = book.isbn||'';
+    document.getElementById('bookCat').value = book.category;
+    document.getElementById('bookPublisher').value = book.publisher||'';
+    document.getElementById('bookYear').value = book.year_published||'';
+    document.getElementById('bookCopies').value = book.copies_total;
+    document.getElementById('bookColor').value = book.cover_color||'#1E40AF';
+    document.getElementById('bookDesc').value = book.description||'';
+    selectedBookColor = book.cover_color||'#1E40AF';
+  }
+  initLucide();
+}
+
+async function editBook(id) {
+  try {
+    const { book } = await api('GET', `/api/books/${id}`);
+    openBookModal(book);
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function viewBook(id) {
+  try {
+    const { book, history } = await api('GET', `/api/books/${id}`);
+    document.getElementById('bookDetailTitle').textContent = book.title;
+    document.getElementById('bookDetailContent').innerHTML = `
+      <div style="display:flex;gap:20px;margin-bottom:24px;flex-wrap:wrap">
+        <div style="width:80px;height:110px;background:${book.cover_color||'#3B82F6'};border-radius:6px;flex-shrink:0"></div>
+        <div>
+          <div style="color:#9ca3af;font-size:12px;margin-bottom:4px">${book.category}</div>
+          <div style="font-size:20px;font-weight:700;margin-bottom:6px">${book.title}</div>
+          <div style="color:#94a3b8;margin-bottom:4px">${book.author}</div>
+          ${book.isbn ? `<div style="color:#6b7280;font-size:13px">ISBN: ${book.isbn}</div>` : ''}
+          ${book.year_published ? `<div style="color:#6b7280;font-size:13px">Viti: ${book.year_published}</div>` : ''}
+          ${book.publisher ? `<div style="color:#6b7280;font-size:13px">Botues: ${book.publisher}</div>` : ''}
+        </div>
+        <div style="margin-left:auto;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <div class="stat-card" style="text-align:center;padding:12px 20px">
+            <div style="font-size:24px;font-weight:700;color:#4f6ef7">${book.copies_total}</div>
+            <div style="color:#6b7280;font-size:12px">Kopje totale</div>
+          </div>
+          <div class="stat-card" style="text-align:center;padding:12px 20px">
+            <div style="font-size:24px;font-weight:700;color:${book.copies_available>0?'#059669':'#dc2626'}">${book.copies_available}</div>
+            <div style="color:#6b7280;font-size:12px">Disponueshme</div>
+          </div>
+          <div class="stat-card" style="text-align:center;padding:12px 20px">
+            <div style="font-size:24px;font-weight:700;color:#d97706">${book.times_borrowed}</div>
+            <div style="color:#6b7280;font-size:12px">Herë lexuar</div>
+          </div>
+        </div>
+      </div>
+      ${book.description ? `<div style="color:#94a3b8;margin-bottom:20px;line-height:1.6">${book.description}</div>` : ''}
+      <h4 style="font-weight:600;margin-bottom:12px">Historia e huazimeve (${history.length})</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Lexuesi</th><th>Dhënë</th><th>Afati</th><th>Kthyer</th><th>Statusi</th></tr></thead>
+          <tbody>${history.map(h=>`
+            <tr>
+              <td>${h.reader_name}</td>
+              <td>${fmtDate(h.date_given)}</td>
+              <td>${fmtDate(h.date_due)}</td>
+              <td>${fmtDate(h.date_returned)}</td>
+              <td><span class="status-${h.status}">${h.status}</span></td>
+            </tr>
+          `).join('')||'<tr><td colspan="5" style="text-align:center;color:#6b7280">Asnjë huazim.</td></tr>'}</tbody>
+        </table>
+      </div>
+    `;
+    document.getElementById('bookDetailModal').style.display='flex';
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function saveBook() {
+  const id = document.getElementById('bookId').value;
+  const data = {
+    title: document.getElementById('bookTitle').value,
+    author: document.getElementById('bookAuthor').value,
+    isbn: document.getElementById('bookISBN').value || null,
+    category: document.getElementById('bookCat').value,
+    publisher: document.getElementById('bookPublisher').value || null,
+    year_published: document.getElementById('bookYear').value || null,
+    copies_total: parseInt(document.getElementById('bookCopies').value),
+    cover_color: document.getElementById('bookColor').value,
+    description: document.getElementById('bookDesc').value || null,
+  };
+  try {
+    if (id) await api('PUT', `/api/books/${id}`, data);
+    else await api('POST', '/api/books', data);
+    closeModal('bookModal');
+    toast(id ? 'Libri u përditësua!' : 'Libri u shtua!');
+    loadBooks();
+    loadBookshelf();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deleteBook(id) {
+  if (!confirm('Fshi këtë libër?')) return;
+  try {
+    await api('DELETE', `/api/books/${id}`);
+    toast('Libri u fshi.');
+    loadBooks();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// READERS
+async function loadReaders() {
+  const search = document.getElementById('readerSearch')?.value || '';
+  const status = document.getElementById('readerStatusFilter')?.value || '';
+  try {
+    const readers = await api('GET', `/api/readers?search=${encodeURIComponent(search)}&status=${status}&limit=50`);
+    document.getElementById('readersTable').innerHTML = readers.map(r=>`
+      <tr>
+        <td>
+          <div style="font-weight:500">${r.name} ${r.surname}</div>
+          ${r.email ? `<div style="color:#6b7280;font-size:12px">${r.email}</div>` : ''}
+        </td>
+        <td style="color:#9ca3af;font-size:13px">${r.personal_id||'—'}</td>
+        <td style="font-size:13px">${r.phone||'—'}</td>
+        <td style="color:#6b7280;font-size:12px">${fmtDate(r.membership_date)}</td>
+        <td><span class="status-${r.status}">${r.status}</span></td>
+        <td style="text-align:center">
+          ${r.active_borrowings > 0 ? `<span class="badge badge-yellow">${r.active_borrowings}</span>` : '<span style="color:#4b5563">0</span>'}
+        </td>
+        <td style="text-align:center"><span class="badge badge-blue">${r.total_borrowed}</span></td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-outline btn-sm" onclick="viewReader(${r.id})" title="Detajet">
+              <i data-lucide="eye" style="width:13px;height:13px"></i>
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="editReader(${r.id})" title="Edito">
+              <i data-lucide="edit-2" style="width:13px;height:13px"></i>
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deleteReader(${r.id})" title="Fshi">
+              <i data-lucide="trash-2" style="width:13px;height:13px"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="8" style="text-align:center;color:#6b7280;padding:20px">Asnjë lexues.</td></tr>';
+    initLucide();
+  } catch(e) {}
+}
+
+function openReaderModal(reader=null) {
+  document.getElementById('readerId').value = '';
+  ['readerName','readerSurname','readerPID','readerPhone','readerEmail','readerBirthday','readerAddress','readerNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('readerStatus').value='aktiv';
+  document.getElementById('readerStatusRow').style.display='none';
+  document.getElementById('readerModalTitle').textContent = 'Shto Lexues';
+  document.getElementById('readerModal').style.display='flex';
+  if(reader) {
+    document.getElementById('readerModalTitle').textContent = 'Edito Lexuesin';
+    document.getElementById('readerId').value = reader.id;
+    document.getElementById('readerName').value = reader.name;
+    document.getElementById('readerSurname').value = reader.surname;
+    document.getElementById('readerPID').value = reader.personal_id||'';
+    document.getElementById('readerPhone').value = reader.phone||'';
+    document.getElementById('readerEmail').value = reader.email||'';
+    document.getElementById('readerBirthday').value = reader.birthday||'';
+    document.getElementById('readerAddress').value = reader.address||'';
+    document.getElementById('readerNotes').value = reader.notes||'';
+    document.getElementById('readerStatus').value = reader.status;
+    document.getElementById('readerStatusRow').style.display='block';
+  }
+  initLucide();
+}
+
+async function editReader(id) {
+  try {
+    const { reader } = await api('GET', `/api/readers/${id}`);
+    openReaderModal(reader);
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function viewReader(id) {
+  try {
+    const { reader, borrowings } = await api('GET', `/api/readers/${id}`);
+    document.getElementById('readerDetailName').textContent = `${reader.name} ${reader.surname}`;
+    const activeBorrow = borrowings.find(b=>b.status==='aktiv');
+    document.getElementById('readerDetailContent').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+        <div class="stat-card">
+          <div style="font-size:12px;color:#6b7280;margin-bottom:4px">ID Personale</div>
+          <div style="font-weight:500">${reader.personal_id||'—'}</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size:12px;color:#6b7280;margin-bottom:4px">Telefoni</div>
+          <div style="font-weight:500">${reader.phone||'—'}</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size:12px;color:#6b7280;margin-bottom:4px">Email</div>
+          <div style="font-weight:500">${reader.email||'—'}</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size:12px;color:#6b7280;margin-bottom:4px">Anëtar që</div>
+          <div style="font-weight:500">${fmtDate(reader.membership_date)}</div>
+        </div>
+      </div>
+      ${activeBorrow ? `
+        <div style="background:#d9770620;border:1px solid #d97706;border-radius:10px;padding:16px;margin-bottom:20px">
+          <div style="font-weight:600;color:#fbbf24;margin-bottom:8px">📖 Libri aktiv i huazuar</div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div class="cover-mini" style="background:${activeBorrow.cover_color||'#3B82F6'}">${activeBorrow.title?.substring(0,2)}</div>
+            <div>
+              <div style="font-weight:500">${activeBorrow.title}</div>
+              <div style="font-size:13px;color:#9ca3af">${activeBorrow.author}</div>
+              <div style="font-size:12px;color:${isOverdue(activeBorrow.date_due, 'aktiv')?'#f87171':'#34d399'}">
+                Afati: ${fmtDate(activeBorrow.date_due)} ${isOverdue(activeBorrow.date_due,'aktiv')?'⚠️ I VONUAR':''}
+              </div>
+            </div>
+          </div>
+        </div>
+      ` : ''}
+      <div style="display:flex;gap:16px;margin-bottom:20px">
+        <div class="stat-card" style="flex:1;text-align:center">
+          <div style="font-size:28px;font-weight:700;color:#4f6ef7">${reader.total_borrowed}</div>
+          <div style="color:#6b7280;font-size:13px">Total huazuar</div>
+        </div>
+        <div class="stat-card" style="flex:1;text-align:center">
+          <div style="font-size:28px;font-weight:700;color:${reader.active_borrowings>0?'#d97706':'#059669'}">${reader.active_borrowings}</div>
+          <div style="color:#6b7280;font-size:13px">Aktiv tani</div>
+        </div>
+      </div>
+      <h4 style="font-weight:600;margin-bottom:12px">Historia e huazimeve</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Libri</th><th>Dhënë</th><th>Afati</th><th>Kthyer</th><th>Statusi</th></tr></thead>
+          <tbody>${borrowings.map(b=>`
+            <tr>
+              <td>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <div class="cover-mini" style="background:${b.cover_color||'#3B82F6'};width:28px;height:36px;font-size:8px">${b.title?.substring(0,2)}</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:500">${b.title}</div>
+                    <div style="font-size:11px;color:#6b7280">${b.author}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-size:12px">${fmtDate(b.date_given)}</td>
+              <td style="font-size:12px;color:${isOverdue(b.date_due, b.status)?'#f87171':'inherit'}">${fmtDate(b.date_due)}</td>
+              <td style="font-size:12px">${fmtDate(b.date_returned)}</td>
+              <td><span class="status-${isOverdue(b.date_due, b.status)?'vonuar':b.status}">${isOverdue(b.date_due, b.status)?'vonuar':b.status}</span></td>
+            </tr>
+          `).join('')||'<tr><td colspan="5" style="text-align:center;color:#6b7280">Asnjë huazim.</td></tr>'}</tbody>
+        </table>
+      </div>
+    `;
+    document.getElementById('readerDetailModal').style.display='flex';
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function saveReader() {
+  const id = document.getElementById('readerId').value;
+  const data = {
+    name: document.getElementById('readerName').value,
+    surname: document.getElementById('readerSurname').value,
+    personal_id: document.getElementById('readerPID').value || null,
+    phone: document.getElementById('readerPhone').value || null,
+    email: document.getElementById('readerEmail').value || null,
+    birthday: document.getElementById('readerBirthday').value || null,
+    address: document.getElementById('readerAddress').value || null,
+    notes: document.getElementById('readerNotes').value || null,
+    status: document.getElementById('readerStatus').value,
+  };
+  try {
+    if (id) await api('PUT', `/api/readers/${id}`, data);
+    else await api('POST', '/api/readers', data);
+    closeModal('readerModal');
+    toast(id ? 'Lexuesi u përditësua!' : 'Lexuesi u shtua!');
+    loadReaders();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deleteReader(id) {
+  if (!confirm('Fshi këtë lexues?')) return;
+  try {
+    await api('DELETE', `/api/readers/${id}`);
+    toast('Lexuesi u fshi.');
+    loadReaders();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// BORROWINGS
+let borrowOffset = 0;
+async function loadBorrowings() {
+  const status = document.getElementById('borrowStatusFilter')?.value || '';
+  const overdue = document.getElementById('overdueFilter')?.checked ? '1' : '';
+  try {
+    const bs = await api('GET', `/api/borrowings?status=${status}&overdue=${overdue}&limit=50&offset=${borrowOffset}`);
+    document.getElementById('borrowingsTable').innerHTML = bs.map(b=>{
+      const od = isOverdue(b.date_due, b.status);
+      return `
+        <tr>
+          <td>
+            <div style="font-weight:500;font-size:13px">${b.reader_name}</div>
+            <div style="color:#6b7280;font-size:11px">${b.reader_phone||''}</div>
+          </td>
+          <td>
+            <div style="display:flex;gap:8px;align-items:center">
+              <div class="cover-mini" style="background:${b.cover_color||'#3B82F6'};width:28px;height:36px;font-size:8px">${b.book_title?.substring(0,2)}</div>
+              <div>
+                <div style="font-size:13px;font-weight:500">${b.book_title}</div>
+                <div style="font-size:11px;color:#6b7280">${b.book_author}</div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:13px">${fmtDate(b.date_given)}</td>
+          <td style="font-size:13px;color:${od?'#f87171':'inherit'}">${fmtDate(b.date_due)} ${od?'⚠️':''}</td>
+          <td style="font-size:13px;color:#34d399">${fmtDate(b.date_returned)}</td>
+          <td><span class="status-${od?'vonuar':b.status}">${od?'vonuar':b.status}</span></td>
+          <td>
+            <div style="display:flex;gap:6px">
+              ${b.status === 'aktiv' ? `
+                <button class="btn btn-success btn-sm" onclick="returnBook(${b.id})" title="Kthe librin">
+                  <i data-lucide="rotate-ccw" style="width:13px;height:13px"></i> Kthe
+                </button>
+              ` : ''}
+              <button class="btn btn-danger btn-sm" onclick="deleteBorrowing(${b.id})" title="Fshi">
+                <i data-lucide="trash-2" style="width:13px;height:13px"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('') || '<tr><td colspan="7" style="text-align:center;color:#6b7280;padding:20px">Asnjë huazim.</td></tr>';
+    initLucide();
+  } catch(e) {}
+}
+
+// Search in borrow modal
+async function searchBorrowReader() {
+  const q = document.getElementById('borrowReaderSearch').value;
+  if (q.length < 2) { document.getElementById('borrowReaderList').style.display='none'; return; }
+  try {
+    const readers = await api('GET', `/api/readers?search=${encodeURIComponent(q)}&status=aktiv&limit=10`);
+    const list = document.getElementById('borrowReaderList');
+    if (!readers.length) { list.style.display='none'; return; }
+    list.innerHTML = readers.map(r=>`
+      <div onclick="selectBorrowReader(${r.id},'${r.name} ${r.surname}',${r.active_borrowings})"
+        style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #1e2535;display:flex;justify-content:space-between;align-items:center"
+        onmouseover="this.style.background='#ffffff10'" onmouseout="this.style.background=''">
+        <div>
+          <div style="font-weight:500;font-size:14px">${r.name} ${r.surname}</div>
+          <div style="font-size:12px;color:#6b7280">${r.phone||''}</div>
+        </div>
+        ${r.active_borrowings > 0 ? '<span class="badge badge-red">Ka libër aktiv</span>' : '<span class="badge badge-green">Lirë</span>'}
+      </div>
+    `).join('');
+    list.style.display = 'block';
+  } catch(e) {}
+}
+
+function selectBorrowReader(id, name, active) {
+  document.getElementById('borrowReaderId').value = id;
+  document.getElementById('borrowReaderSearch').value = '';
+  document.getElementById('borrowReaderList').style.display = 'none';
+  const sel = document.getElementById('borrowReaderSelected');
+  sel.style.display = 'block';
+  sel.innerHTML = `<div style="font-weight:500;color:#60a5fa">${name}</div>
+    ${active > 0 ? '<div style="color:#f87171;font-size:12px;margin-top:4px">⚠️ Ka libër aktiv — nuk mund të marrë tjetër</div>' : '<div style="color:#34d399;font-size:12px;margin-top:4px">✓ Mund të marrë libër</div>'}`;
+}
+
+async function searchBorrowBook() {
+  const q = document.getElementById('borrowBookSearch').value;
+  if (q.length < 2) { document.getElementById('borrowBookList').style.display='none'; return; }
+  try {
+    const { books } = await api('GET', `/api/books?search=${encodeURIComponent(q)}&available=1&limit=10`);
+    const list = document.getElementById('borrowBookList');
+    if (!books.length) { list.style.display='none'; return; }
+    list.innerHTML = books.map(b=>`
+      <div onclick="selectBorrowBook(${b.id},'${b.title.replace(/'/g,"\\'")}','${b.cover_color||'#3B82F6'}')"
+        style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #1e2535;display:flex;align-items:center;gap:10px"
+        onmouseover="this.style.background='#ffffff10'" onmouseout="this.style.background=''">
+        <div class="cover-mini" style="background:${b.cover_color||'#3B82F6'}">${b.title.substring(0,2)}</div>
+        <div>
+          <div style="font-weight:500;font-size:14px">${b.title}</div>
+          <div style="font-size:12px;color:#6b7280">${b.author} · ${b.copies_available} kopje</div>
+        </div>
+      </div>
+    `).join('');
+    list.style.display = 'block';
+  } catch(e) {}
+}
+
+function selectBorrowBook(id, title, color) {
+  document.getElementById('borrowBookId').value = id;
+  document.getElementById('borrowBookSearch').value = '';
+  document.getElementById('borrowBookList').style.display = 'none';
+  const sel = document.getElementById('borrowBookSelected');
+  sel.style.display = 'block';
+  sel.innerHTML = `<div style="display:flex;gap:10px;align-items:center">
+    <div class="cover-mini" style="background:${color}">${title.substring(0,2)}</div>
+    <div style="font-weight:500;color:#34d399">${title}</div>
+  </div>`;
+}
+
+function openBorrowModal() {
+  document.getElementById('borrowReaderId').value = '';
+  document.getElementById('borrowBookId').value = '';
+  document.getElementById('borrowReaderSearch').value = '';
+  document.getElementById('borrowBookSearch').value = '';
+  document.getElementById('borrowNotes').value = '';
+  document.getElementById('borrowReaderSelected').style.display = 'none';
+  document.getElementById('borrowBookSelected').style.display = 'none';
+  document.getElementById('borrowReaderList').style.display = 'none';
+  document.getElementById('borrowBookList').style.display = 'none';
+  document.getElementById('borrowModal').style.display = 'flex';
+  initLucide();
+}
+
+async function saveBorrowing() {
+  const reader_id = document.getElementById('borrowReaderId').value;
+  const book_id = document.getElementById('borrowBookId').value;
+  const notes = document.getElementById('borrowNotes').value;
+  if (!reader_id) return toast('Zgjidh lexuesin', 'error');
+  if (!book_id) return toast('Zgjidh librin', 'error');
+  try {
+    const r = await api('POST', '/api/borrowings', { reader_id, book_id, notes });
+    closeModal('borrowModal');
+    toast(`Libri u dha! Afati kthimit: ${fmtDate(r.date_due)}`);
+    loadBorrowings();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function returnBook(id) {
+  if (!confirm('Konfirmo kthimin e librit?')) return;
+  try {
+    await api('PUT', `/api/borrowings/${id}/return`);
+    toast('Libri u kthye me sukses!');
+    loadBorrowings();
+    loadDashboard();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deleteBorrowing(id) {
+  if (!confirm('Fshi këtë huazim?')) return;
+  try {
+    await api('DELETE', `/api/borrowings/${id}`);
+    toast('Huazimi u fshi.');
+    loadBorrowings();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// REPORTS
+async function loadReports() {
+  const now = new Date();
+  const curMonth = String(now.getMonth()+1).padStart(2,'0');
+  const curYear = now.getFullYear();
+
+  // Populate year selects
+  const years = [];
+  for(let y=curYear; y>=curYear-5; y--) years.push(y);
+
+  const romYear = document.getElementById('romYear');
+  const royYear = document.getElementById('royYear');
+  const chartYear = document.getElementById('chartYear');
+  [romYear, royYear, chartYear].forEach(sel => {
+    sel.innerHTML = years.map(y=>`<option value="${y}" ${y===curYear?'selected':''}>${y}</option>`).join('');
+  });
+
+  document.getElementById('romMonth').value = curMonth;
+  document.getElementById('romYear').value = curYear;
+  document.getElementById('royYear').value = curYear;
+  document.getElementById('chartYear').value = curYear;
+
+  loadReaderOfMonth();
+  loadReaderOfYear();
+  loadTopReaders();
+  loadMonthlyChart();
+}
+
+async function loadReaderOfMonth() {
+  const month = document.getElementById('romMonth').value;
+  const year = document.getElementById('romYear').value;
+  const months = ['Janar','Shkurt','Mars','Prill','Maj','Qershor','Korrik','Gusht','Shtator','Tetor','Nëntor','Dhjetor'];
+  document.getElementById('romPeriod').textContent = `${months[parseInt(month)-1]} ${year}`;
+  try {
+    const r = await api('GET', `/api/stats/reader-of-month?month=${month}&year=${year}`);
+    const el = document.getElementById('readerOfMonthCard');
+    el.innerHTML = r ? `
+      <div style="background:#4f6ef720;border:1px solid #4f6ef7;border-radius:10px;padding:16px">
+        <div style="font-size:32px;margin-bottom:8px">🏆</div>
+        <div style="font-size:20px;font-weight:700">${r.name} ${r.surname}</div>
+        <div style="color:#60a5fa;font-size:14px;margin-top:4px">${r.books_count} libra të huazuar</div>
+        ${r.phone ? `<div style="color:#6b7280;font-size:12px;margin-top:4px">📞 ${r.phone}</div>` : ''}
+      </div>
+    ` : '<div style="color:#6b7280;font-size:14px;text-align:center;padding:20px">Asnjë huazim për këtë periudhë.</div>';
+  } catch(e) {}
+}
+
+async function loadReaderOfYear() {
+  const year = document.getElementById('royYear').value;
+  document.getElementById('royPeriod').textContent = `Viti ${year}`;
+  try {
+    const r = await api('GET', `/api/stats/reader-of-year?year=${year}`);
+    const el = document.getElementById('readerOfYearCard');
+    el.innerHTML = r ? `
+      <div style="background:#7c3aed20;border:1px solid #7c3aed;border-radius:10px;padding:16px">
+        <div style="font-size:32px;margin-bottom:8px">👑</div>
+        <div style="font-size:20px;font-weight:700">${r.name} ${r.surname}</div>
+        <div style="color:#a78bfa;font-size:14px;margin-top:4px">${r.books_count} libra të huazuar</div>
+        ${r.phone ? `<div style="color:#6b7280;font-size:12px;margin-top:4px">📞 ${r.phone}</div>` : ''}
+      </div>
+    ` : '<div style="color:#6b7280;font-size:14px;text-align:center;padding:20px">Asnjë huazim për këtë vit.</div>';
+  } catch(e) {}
+}
+
+async function loadTopReaders() {
+  try {
+    const readers = await api('GET', '/api/stats/top-readers');
+    const medals = ['🥇','🥈','🥉'];
+    document.getElementById('topReadersTable').innerHTML = readers.map((r,i)=>`
+      <tr>
+        <td style="font-size:16px">${medals[i] || `#${i+1}`}</td>
+        <td style="font-weight:${i<3?'600':'400'}">${r.name} ${r.surname}</td>
+        <td><span class="badge badge-${i===0?'yellow':i===1?'blue':'green'}">${r.books_count} libra</span></td>
+      </tr>
+    `).join('') || '<tr><td colspan="3" style="text-align:center;color:#6b7280">Asnjë të dhënë.</td></tr>';
+  } catch(e) {}
+}
+
+async function loadMonthlyChart() {
+  const year = document.getElementById('chartYear').value;
+  try {
+    const data = await api('GET', `/api/stats/monthly?year=${year}`);
+    const monthNames = ['Jan','Shk','Mar','Pri','Maj','Qer','Kor','Gus','Sht','Tet','Nën','Dhj'];
+    const counts = Array(12).fill(0);
+    data.forEach(d => counts[parseInt(d.month)-1] = d.count);
+    const max = Math.max(...counts, 1);
+    const chart = document.getElementById('monthlyChart');
+    const labels = document.getElementById('monthlyLabels');
+    chart.innerHTML = counts.map((c,i)=>`
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px">
+        ${c>0?`<div style="font-size:10px;color:#9ca3af">${c}</div>`:''}
+        <div style="width:100%;background:${c>0?'#4f6ef7':'#1e2535'};border-radius:4px 4px 0 0;height:${Math.round((c/max)*100)}%;min-height:${c>0?'4px':'0'};transition:height 0.3s"></div>
+      </div>
+    `).join('');
+    labels.innerHTML = monthNames.map(m=>`<div style="flex:1;text-align:center;font-size:10px;color:#6b7280">${m}</div>`).join('');
+  } catch(e) {}
+}
+
+// SETTINGS
+async function loadSettingsForm() {
+  try {
+    const s = await api('GET', '/api/settings');
+    document.getElementById('setLibName').value = s.library_name||'';
+    document.getElementById('setLibAddress').value = s.library_address||'';
+    document.getElementById('setLibPhone').value = s.library_phone||'';
+    document.getElementById('setLibEmail').value = s.library_email||'';
+    document.getElementById('setLibHours').value = s.library_hours||'';
+    document.getElementById('setLibFounded').value = s.library_founded||'';
+    document.getElementById('setBorrowDays').value = s.borrow_days||'14';
+    document.getElementById('setLibHistory').value = s.library_history||'';
+  } catch(e) {}
+}
+
+async function saveSettings() {
+  try {
+    await api('PUT', '/api/settings', {
+      library_name: document.getElementById('setLibName').value,
+      library_address: document.getElementById('setLibAddress').value,
+      library_phone: document.getElementById('setLibPhone').value,
+      library_email: document.getElementById('setLibEmail').value,
+      library_hours: document.getElementById('setLibHours').value,
+      library_founded: document.getElementById('setLibFounded').value,
+      borrow_days: document.getElementById('setBorrowDays').value,
+      library_history: document.getElementById('setLibHistory').value,
+    });
+    toast('Cilësimet u ruajtën!');
+    loadAdminSettings();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  initLucide();
+  loadPublicSite();
+});
+
+// Close dropdowns on click outside
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#borrowReaderSearch') && !e.target.closest('#borrowReaderList'))
+    document.getElementById('borrowReaderList').style.display='none';
+  if (!e.target.closest('#borrowBookSearch') && !e.target.closest('#borrowBookList'))
+    document.getElementById('borrowBookList').style.display='none';
+});
+</script>
+</body>
+</html>

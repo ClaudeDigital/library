@@ -77,38 +77,84 @@ db.exec(`
 
   INSERT OR IGNORE INTO admin_users (username, password_hash) VALUES ('admin', '${bcrypt.hashSync('admin123', 10)}');
 
-  INSERT OR IGNORE INTO settings (key, value) VALUES ('library_name', 'Biblioteka e Qytetit');
-  INSERT OR IGNORE INTO settings (key, value) VALUES ('library_address', 'Rruga Kryesore, Prishtinë');
-  INSERT OR IGNORE INTO settings (key, value) VALUES ('library_phone', '+383 44 000 000');
-  INSERT OR IGNORE INTO settings (key, value) VALUES ('library_email', 'info@biblioteka.com');
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('library_name', 'Biblioteka e Malishevës');
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('library_address', 'Rr. Skënder Luarasi, Malishevë 21000, Kosovë');
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('library_phone', '+383 29 000 123');
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('library_email', 'biblioteka@malisheva.org');
   INSERT OR IGNORE INTO settings (key, value) VALUES ('borrow_days', '14');
-  INSERT OR IGNORE INTO settings (key, value) VALUES ('library_history', 'Biblioteka jonë u themelua në vitin 1960 dhe ka shërbyer komunitetin për mbi 60 vjet. Me një koleksion të pasur librash nga fusha të ndryshme, ne ofrojmë akses falas në dije për të gjithë qytetarët.');
-  INSERT OR IGNORE INTO settings (key, value) VALUES ('library_founded', '1960');
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('library_history', 'Biblioteka Publike e Malishevës u themelua në vitin 1968 si institucion kulturor i rëndësishëm për komunën. Për mbi 55 vjet ka shërbyer me përkushtim komunitetin e Malishevës, duke ofruar akses falas në dije, kulturë dhe edukim për të gjithë qytetarët — nga fëmijët deri te të moshuarit. Sot biblioteka ynë mban mbi 20,000 tituj librash dhe shërben qindra lexues çdo muaj.');
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('library_founded', '1968');
   INSERT OR IGNORE INTO settings (key, value) VALUES ('library_hours', 'E Hënë - E Premte: 08:00 - 20:00 | E Shtunë: 09:00 - 14:00');
+
+  UPDATE settings SET value = 'Biblioteka e Malishevës' WHERE key = 'library_name';
+  UPDATE settings SET value = 'Rr. Skënder Luarasi, Malishevë 21000, Kosovë' WHERE key = 'library_address';
+  UPDATE settings SET value = '+383 29 000 123' WHERE key = 'library_phone';
+  UPDATE settings SET value = 'biblioteka@malisheva.org' WHERE key = 'library_email';
+  UPDATE settings SET value = 'Biblioteka Publike e Malishevës u themelua në vitin 1968 si institucion kulturor i rëndësishëm për komunën. Për mbi 55 vjet ka shërbyer me përkushtim komunitetin e Malishevës, duke ofruar akses falas në dije, kulturë dhe edukim për të gjithë qytetarët — nga fëmijët deri te të moshuarit. Sot biblioteka ynë mban mbi 20,000 tituj librash dhe shërben qindra lexues çdo muaj.' WHERE key = 'library_history';
+  UPDATE settings SET value = '1968' WHERE key = 'library_founded';
 `);
 
-// Seed some books if empty
+// Seed books if empty
 const bookCount = db.prepare('SELECT COUNT(*) as c FROM books').get();
 if (bookCount.c === 0) {
   const insertBook = db.prepare(`INSERT INTO books (title, author, isbn, category, description, year_published, copies_total, copies_available, cover_color, times_borrowed) VALUES (?,?,?,?,?,?,?,?,?,?)`);
   const books = [
-    ['Kronikë në Gur', 'Ismail Kadare', '978-99927-1-001-1', 'Letërsi Shqipe', 'Roman i njohur i Kadaresë', 1971, 3, 3, '#1E40AF', 45],
-    ['Gjenerali i Ushtrisë së Vdekur', 'Ismail Kadare', '978-99927-1-002-2', 'Letërsi Shqipe', 'Roman i famshëm', 1963, 2, 2, '#1E40AF', 38],
-    ['Darka e Gabuar', 'Ismail Kadare', '978-99927-1-003-3', 'Letërsi Shqipe', 'Roman bashkëkohor', 2008, 2, 2, '#4338CA', 21],
+    ['Kronikë në Gur', 'Ismail Kadare', '978-99927-1-001-1', 'Letërsi Shqipe', 'Roman i njohur i Ismail Kadaresë i botuar në 1971', 1971, 3, 3, '#1E40AF', 45],
+    ['Gjenerali i Ushtrisë së Vdekur', 'Ismail Kadare', '978-99927-1-002-2', 'Letërsi Shqipe', 'Romani i parë i Kadaresë, mjet i fuqishëm letrar', 1963, 2, 2, '#1E3A8A', 38],
+    ['Darka e Gabuar', 'Ismail Kadare', '978-99927-1-003-3', 'Letërsi Shqipe', 'Roman bashkëkohor i Kadaresë', 2008, 2, 2, '#312E81', 21],
+    ['Komiseri Memo', 'Ismail Kadare', '978-99927-1-004-4', 'Letërsi Shqipe', 'Tregim i famshëm i Kadaresë', 1999, 1, 1, '#3730A3', 16],
+    ['Pallati i Ëndrrave', 'Ismail Kadare', '978-99927-1-005-5', 'Letërsi Shqipe', 'Roman historik', 1982, 2, 2, '#4338CA', 29],
+    ['Vepra Letrare', 'Naim Frashëri', '978-99927-1-006-6', 'Letërsi Shqipe', 'Koleksion veprash të poetit kombëtar', 1900, 2, 2, '#7C3AED', 34],
+    ['Bagëti e Bujqësia', 'Naim Frashëri', '978-99927-1-007-7', 'Letërsi Shqipe', 'Poema e famshme e Naim Frashërit', 1886, 1, 1, '#6D28D9', 19],
+    ['Historia e Skënderbeut', 'Fan Noli', '978-99927-1-008-8', 'Histori', 'Biografia e Heroit Kombëtar', 1921, 2, 2, '#B45309', 42],
+    ['Historia e Popullit Shqiptar', 'Akademia e Shkencave', '978-99927-3-001-1', 'Histori', 'Historia kombëtare — botim i plotë', 2002, 4, 4, '#92400E', 29],
     ['Çështje të Filozofisë', 'Aristoteli', '978-99927-2-001-1', 'Filozofi', 'Vepra klasike filozofike', 2010, 1, 1, '#7C3AED', 12],
-    ['Historia e Popullit Shqiptar', 'Akademia e Shkencave', '978-99927-3-001-1', 'Histori', 'Historia kombëtare', 2002, 4, 4, '#B45309', 29],
-    ['Fjalori i Gjuhës Shqipe', 'Akademia e Shkencave', '978-99927-4-001-1', 'Gjuhësi', 'Fjalor i plotë', 2006, 2, 2, '#065F46', 33],
-    ['Matematika 9', 'Autorë të ndryshëm', '978-99927-5-001-1', 'Shkencë', 'Tekst shkollor', 2020, 5, 5, '#DC2626', 18],
-    ['Biologjia Moderne', 'B. Douglas', '978-00001-1-001-1', 'Shkencë', 'Biologji e avancuar', 2018, 3, 3, '#15803D', 9],
+    ['Republika', 'Platoni', '978-99927-2-002-2', 'Filozofi', 'Dialog filozofik i Platonit', 380, 1, 1, '#6D28D9', 8],
+    ['Fjalori i Gjuhës Shqipe', 'Akademia e Shkencave', '978-99927-4-001-1', 'Gjuhësi', 'Fjalor i plotë i gjuhës shqipe', 2006, 2, 2, '#065F46', 33],
+    ['Gramatika e Gjuhës Shqipe', 'Shaban Demiraj', '978-99927-4-002-2', 'Gjuhësi', 'Gramatika standarde', 1988, 2, 2, '#064E3B', 17],
+    ['Biologjia Moderne', 'B. Douglas', '978-00001-1-001-1', 'Shkencë', 'Biologji e avancuar për studiues', 2018, 3, 3, '#15803D', 9],
+    ['Fizika e Përgjithshme', 'Halliday & Resnick', '978-00001-2-001-1', 'Shkencë', 'Tekst standard i fizikës', 2013, 2, 2, '#166534', 11],
+    ['Matematika e Lartë', 'N. Piskunov', '978-00001-3-001-1', 'Shkencë', 'Analizë matematike', 2010, 3, 3, '#DC2626', 22],
     ['Histori e Artit', 'E.H. Gombrich', '978-00002-1-001-1', 'Art', 'Historia e artit botëror', 2015, 1, 1, '#9333EA', 14],
-    ['Kodi Da Vinci', 'Dan Brown', '978-00003-1-001-1', 'Letërsi Botërore', 'Roman i njohur thriller', 2003, 3, 3, '#C2410C', 52],
-    ['Njëqind Vjet Vetmi', 'Gabriel García Márquez', '978-00004-1-001-1', 'Letërsi Botërore', 'Klasik i letërsisë latine', 1967, 2, 2, '#0F766E', 41],
+    ['Kodi Da Vinci', 'Dan Brown', '978-00003-1-001-1', 'Letërsi Botërore', 'Thriller i famshëm botëror', 2003, 3, 3, '#C2410C', 52],
+    ['Angjelli dhe Djalli', 'Dan Brown', '978-00003-1-002-2', 'Letërsi Botërore', 'Thriller nga Dan Brown', 2000, 2, 2, '#9A3412', 31],
+    ['Njëqind Vjet Vetmi', 'Gabriel García Márquez', '978-00004-1-001-1', 'Letërsi Botërore', 'Klasik i realizmit magjik', 1967, 2, 2, '#0F766E', 41],
     ['Lufta dhe Paqja', 'Lev Tolstoi', '978-00005-1-001-1', 'Letërsi Botërore', 'Masterpiece i letërsisë ruse', 1869, 1, 1, '#1D4ED8', 27],
-    ['Krimbi dhe Dënimi', 'Dostojevski', '978-00006-1-001-1', 'Letërsi Botërore', 'Roman klasik rus', 1866, 2, 2, '#7C2D12', 23],
-    ['Fëmijëria', 'Lev Tolstoi', '978-00007-1-001-1', 'Letërsi Botërore', 'Autobiografi letrare', 1852, 1, 1, '#1D4ED8', 15],
+    ['Ana Karenina', 'Lev Tolstoi', '978-00005-1-002-2', 'Letërsi Botërore', 'Roman psikologjik', 1878, 2, 2, '#1E40AF', 33],
+    ['Krim dhe Ndëshkim', 'Fjodor Dostojevski', '978-00006-1-001-1', 'Letërsi Botërore', 'Roman klasik rus', 1866, 2, 2, '#7C2D12', 23],
     ['Plaku dhe Deti', 'Ernest Hemingway', '978-00008-1-001-1', 'Letërsi Botërore', 'Roman i shkurtër i famshëm', 1952, 2, 2, '#0369A1', 36],
+    ['Dielli Lind Gjithnjë', 'Ernest Hemingway', '978-00008-1-002-2', 'Letërsi Botërore', 'Roman i gjeneratës së humbur', 1926, 1, 1, '#075985', 18],
+    ['Harry Potter dhe Guri Filozofal', 'J.K. Rowling', '978-00009-1-001-1', 'Fëmijëve', 'Romani i parë i serisë Harry Potter', 1997, 4, 4, '#B45309', 68],
+    ['Princi i Vogël', 'Antoine de Saint-Exupéry', '978-00010-1-001-1', 'Fëmijëve', 'Libri i famshëm filozofik për fëmijë', 1943, 3, 3, '#D97706', 57],
+    ['Orwell: 1984', 'George Orwell', '978-00011-1-001-1', 'Letërsi Botërore', 'Distopi klasike', 1949, 2, 2, '#374151', 44],
+    ['Ferma e Kafshëve', 'George Orwell', '978-00011-1-002-2', 'Letërsi Botërore', 'Alegori satirike', 1945, 2, 2, '#1F2937', 39],
+    ['Guri i Durimit', 'Atiq Rahimi', '978-00012-1-001-1', 'Letërsi Botërore', 'Roman i shkurtër laureat i çmimit Goncourt', 2008, 1, 1, '#78350F', 13],
   ];
   for (const b of books) insertBook.run(...b);
+}
+
+// Seed readers if empty
+const readerCount = db.prepare('SELECT COUNT(*) as c FROM readers').get();
+if (readerCount.c === 0) {
+  const insertReader = db.prepare(`INSERT INTO readers (name, surname, personal_id, phone, email, address, birthday, membership_date, status) VALUES (?,?,?,?,?,?,?,?,?)`);
+  const readers = [
+    ['Arben', 'Berisha', '1234567890', '+383 44 111 222', 'arben.berisha@email.com', 'Rr. Liria, Malishevë', '1990-03-15', '2023-01-10', 'aktiv'],
+    ['Valdete', 'Krasniqi', '1234567891', '+383 44 222 333', 'valdete.k@email.com', 'Lagjja Qendër, Malishevë', '1985-07-22', '2023-02-14', 'aktiv'],
+    ['Granit', 'Hyseni', '1234567892', '+383 45 333 444', 'granit.hyseni@email.com', 'Rr. Skënderbeu, Malishevë', '1998-11-05', '2023-03-01', 'aktiv'],
+    ['Mirjeta', 'Selmani', '1234567893', '+383 44 444 555', 'mirjeta.s@email.com', 'Lagja e Re, Malishevë', '1992-01-18', '2023-04-20', 'aktiv'],
+    ['Besim', 'Gashi', '1234567894', '+383 49 555 666', 'besim.gashi@email.com', 'Rr. Nënë Tereza, Malishevë', '1978-09-30', '2023-05-05', 'aktiv'],
+    ['Arta', 'Murati', '1234567895', '+383 44 666 777', 'arta.murati@email.com', 'Qendra, Malishevë', '2001-06-12', '2023-06-11', 'aktiv'],
+    ['Liridona', 'Shala', '1234567896', '+383 45 777 888', 'liridona@email.com', 'Lagjja Dardania, Malishevë', '1995-04-25', '2023-07-03', 'aktiv'],
+    ['Faton', 'Bytyqi', '1234567897', '+383 44 888 999', 'faton.b@email.com', 'Rr. Adem Jashari, Malishevë', '1988-12-08', '2023-08-17', 'aktiv'],
+    ['Drita', 'Rexhepi', '1234567898', '+383 49 999 000', 'drita.r@email.com', 'Lagja Shpresa, Malishevë', '2003-02-14', '2023-09-22', 'aktiv'],
+    ['Kujtim', 'Osmani', '1234567899', '+383 44 100 200', 'kujtim.o@email.com', 'Rr. Isa Boletini, Malishevë', '1975-08-19', '2023-10-30', 'aktiv'],
+    ['Albana', 'Hasani', '1234567800', '+383 45 200 300', 'albana.h@email.com', 'Qendra, Malishevë', '2000-05-07', '2024-01-15', 'aktiv'],
+    ['Rilind', 'Zeqiri', '1234567801', '+383 44 300 400', 'rilind.z@email.com', 'Lagjja Flaka, Malishevë', '1997-10-31', '2024-02-20', 'aktiv'],
+    ['Teuta', 'Morina', '1234567802', '+383 49 400 500', 'teuta.m@email.com', 'Rr. Fehmi Agani, Malishevë', '1983-03-21', '2024-03-08', 'aktiv'],
+    ['Agron', 'Jakupi', '1234567803', '+383 44 500 600', 'agron.j@email.com', 'Lagja Arbëria, Malishevë', '1980-07-14', '2024-04-12', 'aktiv'],
+    ['Flutura', 'Aliu', '1234567804', '+383 45 600 700', 'flutura.a@email.com', 'Rr. Prishtinës, Malishevë', '1993-09-03', '2024-05-25', 'aktiv'],
+  ];
+  for (const r of readers) insertReader.run(...r);
 }
 
 // Auth middleware

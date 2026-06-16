@@ -156,6 +156,85 @@
   body.light [style*="background:rgba(255,255,255,0.06)"]{background:rgba(0,0,0,0.05) !important}
   body.light [style*="background:rgba(255,255,255,0.1)"]{background:rgba(0,0,0,0.06) !important}
   body.light [style*="background:rgba(13,17,23,0.95)"]{background:rgba(255,255,255,0.95) !important}
+
+  /* ═══ MOBILE ═══ */
+  #mobileBottomNav{display:none}
+  #adminHamburger{display:none}
+  #sidebarOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:49}
+
+  @media(max-width:768px){
+    /* NAV */
+    .public-nav>div{height:56px !important;padding:0 14px !important}
+    #navDesktopLinks{display:none !important}
+    .playfair[style*="font-size:18px"]{font-size:15px !important}
+
+    /* BOTTOM NAV */
+    #mobileBottomNav{
+      display:flex;position:fixed;bottom:0;left:0;right:0;z-index:40;
+      background:#0d1117;border-top:1px solid #2d3748;
+      height:60px;align-items:center;justify-content:space-around;padding:0 4px;
+    }
+    body.light #mobileBottomNav{background:#ffffff;border-top-color:#e2e8f0}
+    .mob-nav-btn{
+      display:flex;flex-direction:column;align-items:center;gap:3px;
+      color:#6b7280;cursor:pointer;padding:6px 12px;border-radius:12px;
+      font-size:10px;font-weight:500;border:none;background:transparent;transition:all 0.2s;
+    }
+    .mob-nav-btn svg{width:20px;height:20px}
+    .mob-nav-btn.active{color:#4f6ef7}
+    body.light .mob-nav-btn{color:#94a3b8}
+    body.light .mob-nav-btn.active{color:#4f6ef7}
+
+    /* PUBLIC SITE PADDING */
+    #publicSite{padding-bottom:64px}
+
+    /* HERO */
+    .hero-bg{padding:28px 14px 20px !important}
+    .hero-bg h1.playfair{font-size:28px !important}
+    #heroSubtext{font-size:14px !important}
+    #bookshelf{padding:14px 14px 0 !important;margin-bottom:24px !important}
+    #shelfRow1{height:120px !important;overflow-x:auto !important;flex-wrap:nowrap !important;gap:3px !important;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    #shelfRow1::-webkit-scrollbar{display:none}
+
+    /* SEARCH */
+    #pub-home>div>div:last-child>div:last-child{padding:16px !important}
+    #pubSearchInput{font-size:14px !important;padding:10px 14px !important}
+
+    /* SECTIONS */
+    #mostReadGrid{grid-template-columns:repeat(2,1fr) !important;gap:10px !important}
+    #latestGrid{grid-template-columns:repeat(2,1fr) !important;gap:10px !important}
+
+    /* SECTION PADDING */
+    #pub-home>div:nth-child(2),#pub-home>div:nth-child(3){padding:24px 14px 0 !important}
+    #pub-home>div:last-child{padding:24px 14px !important}
+
+    /* HISTORY / CONTACT */
+    #pub-history>div,#pub-contact>div{padding:32px 14px !important}
+    #pub-history h1,#pub-contact h1{font-size:28px !important}
+    #historyContent{padding:20px !important}
+    #contactCards{grid-template-columns:1fr !important}
+    #historyContent>div:first-child{flex-direction:column;gap:16px}
+
+    /* MODALS */
+    .modal-bg{align-items:flex-end !important;padding:0 !important}
+    .modal{border-radius:20px 20px 0 0 !important;max-width:100% !important;max-height:88vh !important}
+
+    /* ADMIN */
+    #adminHamburger{
+      display:flex;position:fixed;top:10px;left:12px;z-index:60;
+      width:40px;height:40px;border-radius:10px;align-items:center;justify-content:center;
+      background:#1a1f2e;border:1px solid #2d3748;cursor:pointer;color:#9ca3af;
+    }
+    body.light #adminHamburger{background:#fff;border-color:#e2e8f0;color:#64748b}
+    .sidebar{transform:translateX(-220px);transition:transform 0.3s ease;z-index:55 !important}
+    .sidebar.mob-open{transform:translateX(0)}
+    #sidebarOverlay.mob-open{display:block}
+    .admin-content{margin-left:0 !important;padding:16px !important;padding-top:64px !important}
+    #dashStats{grid-template-columns:repeat(2,1fr) !important}
+    #dashTables{grid-template-columns:1fr !important}
+    .table-wrap{overflow-x:auto}
+    th{white-space:nowrap}
+  }
 </style>
 </head>
 <body>
@@ -176,12 +255,14 @@
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:2px">
-        <button onclick="showPublicPage('home')" id="nav-home" class="nav-pill active-nav">Ballina</button>
-        <button onclick="showPublicPage('history')" id="nav-history" class="nav-pill">Historia</button>
-        <button onclick="showPublicPage('contact')" id="nav-contact" class="nav-pill">Kontakti</button>
-        <button onclick="showAdmin()" class="btn" style="background:rgba(255,255,255,0.06);color:#9ca3af;border:1px solid rgba(255,255,255,0.1);border-radius:100px;margin-left:10px;font-size:13px;padding:7px 14px">
-          <i data-lucide="settings" style="width:13px;height:13px"></i> Admin
-        </button>
+        <div id="navDesktopLinks" style="display:flex;align-items:center;gap:2px">
+          <button onclick="showPublicPage('home')" id="nav-home" class="nav-pill active-nav">Ballina</button>
+          <button onclick="showPublicPage('history')" id="nav-history" class="nav-pill">Historia</button>
+          <button onclick="showPublicPage('contact')" id="nav-contact" class="nav-pill">Kontakti</button>
+          <button onclick="showAdmin()" class="btn" style="background:rgba(255,255,255,0.06);color:#9ca3af;border:1px solid rgba(255,255,255,0.1);border-radius:100px;margin-left:10px;font-size:13px;padding:7px 14px">
+            <i data-lucide="settings" style="width:13px;height:13px"></i> Admin
+          </button>
+        </div>
         <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Ndrysho temën"></button>
       </div>
     </div>
@@ -345,6 +426,26 @@
     </div>
   </div>
 
+  <!-- MOBILE BOTTOM NAV -->
+  <nav id="mobileBottomNav">
+    <button class="mob-nav-btn active" id="mob-home" onclick="showPublicPage('home')">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Ballina
+    </button>
+    <button class="mob-nav-btn" id="mob-history" onclick="showPublicPage('history')">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      Historia
+    </button>
+    <button class="mob-nav-btn" id="mob-contact" onclick="showPublicPage('contact')">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+      Kontakti
+    </button>
+    <button class="mob-nav-btn" onclick="showAdmin()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Admin
+    </button>
+  </nav>
+
 </div><!-- end publicSite -->
 
 <!-- ═══════════════════════════════════ ADMIN SITE ════════════════════════ -->
@@ -382,8 +483,14 @@
 
   <!-- ADMIN PANEL -->
   <div id="adminPanel" style="display:none">
+    <!-- Mobile sidebar overlay -->
+    <div id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+    <!-- Mobile hamburger -->
+    <button id="adminHamburger" onclick="toggleMobileSidebar()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="adminSidebar">
       <div style="padding:20px 16px;border-bottom:1px solid #1e2535">
         <div style="display:flex;align-items:center;gap:10px">
           <div style="width:36px;height:36px;background:linear-gradient(135deg,#4f6ef7,#7c3aed);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -970,10 +1077,20 @@ function showPublicPage(name) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('pub-'+name).classList.add('active');
   ['home','history','contact'].forEach(n => {
-    const el = document.getElementById('nav-'+n);
-    if(el) { el.classList.toggle('active-nav', n===name); }
+    const el = document.getElementById('nav-'+n); if(el) el.classList.toggle('active-nav', n===name);
+    const mob = document.getElementById('mob-'+n); if(mob) mob.classList.toggle('active', n===name);
   });
   if(name==='history') loadHistoryInfo();
+  window.scrollTo(0,0);
+}
+
+function toggleMobileSidebar() {
+  document.getElementById('adminSidebar').classList.toggle('mob-open');
+  document.getElementById('sidebarOverlay').classList.toggle('mob-open');
+}
+function closeMobileSidebar() {
+  document.getElementById('adminSidebar').classList.remove('mob-open');
+  document.getElementById('sidebarOverlay').classList.remove('mob-open');
 }
 
 // ─── ADMIN ───────────────────────────────────────────────────────────────────
@@ -1025,6 +1142,7 @@ function showAdminPage(name) {
   document.getElementById('ap-'+name).classList.add('active');
   document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
   document.getElementById('sl-'+name)?.classList.add('active');
+  closeMobileSidebar();
   if(name==='dashboard') loadDashboard();
   else if(name==='books') { loadBooks(); loadBookFilters(); }
   else if(name==='readers') loadReaders();

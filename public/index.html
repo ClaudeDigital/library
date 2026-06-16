@@ -130,7 +130,7 @@
 
         <!-- BOOKSHELF VISUAL -->
         <div id="bookshelf" style="background:#111827;border-radius:16px;padding:20px 24px 0;overflow:hidden;position:relative;margin-bottom:40px">
-          <div style="display:flex;align-items:flex-end;gap:4px;height:140px;padding-bottom:0" id="shelfRow1"></div>
+          <div style="display:flex;align-items:flex-end;gap:3px;height:155px;padding-bottom:0;overflow:hidden" id="shelfRow1"></div>
           <div class="shelf" style="height:12px;margin:0 -24px"></div>
           <div style="padding:8px 0;text-align:center;color:#4b5563;font-size:12px">📚 Biblioteka jonë</div>
         </div>
@@ -756,18 +756,19 @@ async function loadPublicSite() {
 async function loadBookshelf() {
   try {
     const { books } = await api('GET', '/api/books?limit=30');
-    const colors = books.map(b=>b.cover_color || '#3B82F6');
-    const allColors = [...colors];
-    while(allColors.length < 28) allColors.push(...colors.slice(0, 28 - allColors.length));
-    const heights = [110,130,120,140,115,125,135,108,120,130,125,140,115,120,118,132,122,138,112,128,135,110,125,140,116,130,120,136];
+    const titles = ['Kronikë në Gur','Gjenerali i Ushtrisë së Vdekur','Pallati i Ëndrrave','Prilli i Thyer','Dashuri nën Hije','Naim Frashëri','Bagëti e Bujqësi','Fan Noli - Vepra','Retorika','Republika','Fjalori i Gjuhës','Gramatika Shqipe','Kodi Da Vinci','Ferri','100 Vjet Vetmi','Lufta dhe Paqja','Anna Karenina','Krimi dhe Dënimi','Idiot','Plaku dhe Deti','Për kë bien këmbanat','Harry Potter','Princi i Vogël','Ferma e Kafshëve','1984','Qielli i Mesnatës','Biologjia','Fizika','Matematika','Kimia'];
+    const colors = books.length ? books.map(b=>b.cover_color||'#3B82F6') : ['#1E40AF','#7C3AED','#047857','#B45309','#9D174D','#1D4ED8','#065F46','#92400E','#6D28D9','#0F766E','#B91C1C','#1E3A8A','#5B21B6','#064E3B','#78350F','#831843','#134E4A','#1E40AF','#7C3AED','#047857','#B45309','#9D174D','#1D4ED8','#065F46','#92400E','#6D28D9','#0F766E','#B91C1C','#1E3A8A','#5B21B6'];
+    const allColors = [...colors]; while(allColors.length < 30) allColors.push(...colors);
+    const allTitles = [...titles]; while(allTitles.length < 30) allTitles.push(...titles);
+    const heights = [118,136,124,142,112,130,140,108,126,138,128,144,114,122,136,110,132,120,142,116,128,138,112,140,122,134,118,130,142,120];
     const row1 = document.getElementById('shelfRow1');
     row1.innerHTML = '';
-    const titles = books.map(b=>b.title);
-    for(let i=0; i<28; i++) {
-      const h = heights[i] || 120;
-      const c = allColors[i] || '#3B82F6';
-      const t = titles[i] || '';
-      row1.innerHTML += `<div class="book-spine" style="background:${c};width:24px;height:${h}px;border-radius:3px 6px 6px 3px;writing-mode:vertical-rl;text-orientation:mixed;font-size:8px;color:rgba(255,255,255,0.7);overflow:hidden;padding:4px 2px;display:flex;align-items:center;box-shadow:3px 0 6px rgba(0,0,0,0.4)" title="${t}">${t.substring(0,20)}</div>`;
+    for(let i=0; i<30; i++) {
+      const h = heights[i];
+      const c = allColors[i];
+      const t = (books[i]?.title || allTitles[i]);
+      const short = t.length > 18 ? t.substring(0,17)+'…' : t;
+      row1.innerHTML += `<div class="book-spine" style="background:${c};width:32px;height:${h}px;border-radius:3px 7px 7px 3px;writing-mode:vertical-rl;text-orientation:mixed;font-size:9px;font-weight:600;color:rgba(255,255,255,0.88);overflow:hidden;padding:6px 3px;display:flex;align-items:center;justify-content:center;box-shadow:3px 0 8px rgba(0,0,0,0.5),inset 3px 0 6px rgba(255,255,255,0.08);letter-spacing:0.02em;flex-shrink:0" title="${t}">${short}</div>`;
     }
     initLucide();
   } catch(e) {}

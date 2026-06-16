@@ -129,6 +129,9 @@ if (bookCount.c === 0) {
     ['Orwell: 1984', 'George Orwell', '978-00011-1-001-1', 'Letërsi Botërore', 'Distopi klasike', 1949, 2, 2, '#374151', 44],
     ['Ferma e Kafshëve', 'George Orwell', '978-00011-1-002-2', 'Letërsi Botërore', 'Alegori satirike', 1945, 2, 2, '#1F2937', 39],
     ['Guri i Durimit', 'Atiq Rahimi', '978-00012-1-001-1', 'Letërsi Botërore', 'Roman i shkurtër laureat i çmimit Goncourt', 2008, 1, 1, '#78350F', 13],
+    ['Clean Code', 'Robert C. Martin', '978-01320-0-001-1', 'Programim', 'Udhëzues për shkrim kodi të pastër dhe mirëmbajtur', 2008, 2, 2, '#0F172A', 7],
+    ['The Pragmatic Programmer', 'David Thomas & Andrew Hunt', '978-01320-0-002-2', 'Programim', 'Udhëzuesi i programuesit pragmatik', 1999, 2, 2, '#1E293B', 5],
+    ['Introduction to Algorithms', 'Cormen, Leiserson, Rivest', '978-01320-0-003-3', 'Programim', 'Tekst standard i algoritmeve dhe strukturave të të dhënave', 2009, 1, 1, '#134E4A', 4],
   ];
   for (const b of books) insertBook.run(...b);
 }

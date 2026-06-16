@@ -136,6 +136,25 @@
   body.light #histFounded,body.light #histYears,body.light #histBooks{color:#4f6ef7}
   body.light #contactCards .stat-card div[style*="color:#94a3b8"]{color:#475569}
   body.light #pubSearchResults>div{background:#f8fafc !important;border:1px solid #e2e8f0}
+  /* History page */
+  body.light #pub-history{background:#f1f5f9}
+  body.light #pub-history>div{color:#1e293b}
+  body.light #pub-history h3{color:#1e293b}
+  body.light #historyContent>div>div{color:#1e293b}
+  body.light #historyContent>div>div>div[style*="color:#6b7280"]{color:#64748b !important}
+  body.light #pub-history [style*="color:#4f6ef7"]{color:#4f6ef7 !important}
+  body.light #pub-history [style*="color:#7c3aed"]{color:#7c3aed !important}
+  body.light #pub-history [style*="color:#059669"]{color:#059669 !important}
+  body.light #pub-history [style*="border-left:2px solid #2d3748"]{border-left-color:#e2e8f0 !important}
+  body.light #pub-history [style*="position:absolute"][style*="background:#4f6ef7"]{border-color:#f1f5f9 !important}
+  body.light #pub-history [style*="position:absolute"][style*="background:#7c3aed"]{border-color:#f1f5f9 !important}
+  body.light #pub-history [style*="position:absolute"][style*="background:#059669"]{border-color:#f1f5f9 !important}
+  body.light #pub-history [style*="font-weight:500;margin:4px 0"]{color:#1e293b !important}
+  /* Contact page */
+  body.light #pub-contact{background:#f1f5f9}
+  body.light #pub-contact>div{color:#1e293b}
+  body.light #pub-contact .stat-card{background:#ffffff;border-color:#e2e8f0}
+  body.light #contactAddress,body.light #contactPhone,body.light #contactEmail,body.light #contactHours{color:#475569 !important}
   body.light .playfair{color:inherit}
   body.light [style*="color:#9ca3af"]{color:#64748b !important}
   body.light [style*="color:#94a3b8"]{color:#475569 !important}
@@ -371,7 +390,7 @@
           </div>
           <div>
             <div style="position:absolute;left:-9px;width:16px;height:16px;background:#059669;border-radius:50%;border:3px solid #0d1117"></div>
-            <div style="color:#059669;font-weight:600;font-size:14px">2025</div>
+            <div style="color:#059669;font-weight:600;font-size:14px">2026</div>
             <div style="font-weight:500;margin:4px 0">Sistemi i Ri Dixhital</div>
             <div style="color:#6b7280;font-size:14px">Platforma online për menaxhimin e librave</div>
           </div>
@@ -1065,11 +1084,9 @@ async function loadHistoryInfo() {
   document.getElementById('histFounded').textContent = founded;
   document.getElementById('histYears').textContent = years;
   document.getElementById('histFoundedYear').textContent = founded;
-  document.getElementById('histFoundedYear').closest('div').querySelector('div:nth-child(2)').textContent = `Themelimi i Bibliotekës`;
   try {
-    const { books } = await api('GET', '/api/books?limit=1');
-    // get total count from header or separate call
-    const r2 = await api('GET', '/api/books?limit=1');
+    const r = await api('GET', '/api/books?limit=1');
+    document.getElementById('histBooks').textContent = r.total || '—';
   } catch(e) {}
 }
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Biblioteka e Malishevës</title>
+<title>Biblioteka e Qytetit</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -965,7 +965,7 @@ async function loadPublicSite() {
     settings = await api('GET', '/api/settings');
     const n1 = document.getElementById('navLibName'); if(n1) n1.textContent = settings.library_name || 'Biblioteka';
     const n2 = document.getElementById('navLibName2'); if(n2) n2.textContent = settings.library_name || 'Biblioteka e Malishevës';
-    document.title = settings.library_name || 'Biblioteka e Malishevës';
+    document.title = 'Biblioteka e Qytetit';
     loadBookshelf();
     loadMostRead();
     loadLatest();

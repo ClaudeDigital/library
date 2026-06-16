@@ -132,8 +132,6 @@
         <div id="bookshelf" style="background:#111827;border-radius:16px;padding:20px 24px 0;overflow:hidden;position:relative;margin-bottom:40px">
           <div style="display:flex;align-items:flex-end;gap:4px;height:140px;padding-bottom:0" id="shelfRow1"></div>
           <div class="shelf" style="height:12px;margin:0 -24px"></div>
-          <div style="display:flex;align-items:flex-end;gap:4px;height:120px;padding-top:8px;padding-bottom:0" id="shelfRow2"></div>
-          <div class="shelf" style="height:12px;margin:0 -24px"></div>
           <div style="padding:8px 0;text-align:center;color:#4b5563;font-size:12px">📚 Biblioteka jonë</div>
         </div>
 
@@ -744,7 +742,7 @@ let settings = {};
 async function loadPublicSite() {
   try {
     settings = await api('GET', '/api/settings');
-    document.getElementById('navLibName').textContent = settings.library_name || 'Biblioteka';
+    const n1 = document.getElementById('navLibName'); if(n1) n1.textContent = settings.library_name || 'Biblioteka';
     const n2 = document.getElementById('navLibName2'); if(n2) n2.textContent = settings.library_name || 'Biblioteka e Malishevës';
     document.title = settings.library_name || 'Biblioteka e Malishevës';
     loadBookshelf();
@@ -761,27 +759,15 @@ async function loadBookshelf() {
     const colors = books.map(b=>b.cover_color || '#3B82F6');
     const allColors = [...colors];
     while(allColors.length < 28) allColors.push(...colors.slice(0, 28 - allColors.length));
-
-    const heights1 = [110,130,120,140,115,125,135,108,120,130,125,140,115,120];
-    const heights2 = [100,120,110,130,105,115,125,100,115,120,115,130,105,110];
-
+    const heights = [110,130,120,140,115,125,135,108,120,130,125,140,115,120,118,132,122,138,112,128,135,110,125,140,116,130,120,136];
     const row1 = document.getElementById('shelfRow1');
-    const row2 = document.getElementById('shelfRow2');
     row1.innerHTML = '';
-    row2.innerHTML = '';
-
     const titles = books.map(b=>b.title);
-    for(let i=0; i<14; i++) {
-      const h = heights1[i] || 120;
+    for(let i=0; i<28; i++) {
+      const h = heights[i] || 120;
       const c = allColors[i] || '#3B82F6';
       const t = titles[i] || '';
-      row1.innerHTML += `<div class="book-spine" style="background:${c};width:28px;height:${h}px;border-radius:3px 6px 6px 3px;writing-mode:vertical-rl;text-orientation:mixed;font-size:9px;color:rgba(255,255,255,0.7);overflow:hidden;padding:4px 2px;display:flex;align-items:center;box-shadow:3px 0 6px rgba(0,0,0,0.4)" title="${t}">${t.substring(0,20)}</div>`;
-    }
-    for(let i=14; i<28; i++) {
-      const h = heights2[i-14] || 110;
-      const c = allColors[i] || '#3B82F6';
-      const t = titles[i] || '';
-      row2.innerHTML += `<div class="book-spine" style="background:${c};width:26px;height:${h}px;border-radius:3px 6px 6px 3px;writing-mode:vertical-rl;text-orientation:mixed;font-size:8px;color:rgba(255,255,255,0.7);overflow:hidden;padding:4px 2px;display:flex;align-items:center;box-shadow:3px 0 6px rgba(0,0,0,0.4)" title="${t}">${t.substring(0,18)}</div>`;
+      row1.innerHTML += `<div class="book-spine" style="background:${c};width:24px;height:${h}px;border-radius:3px 6px 6px 3px;writing-mode:vertical-rl;text-orientation:mixed;font-size:8px;color:rgba(255,255,255,0.7);overflow:hidden;padding:4px 2px;display:flex;align-items:center;box-shadow:3px 0 6px rgba(0,0,0,0.4)" title="${t}">${t.substring(0,20)}</div>`;
     }
     initLucide();
   } catch(e) {}

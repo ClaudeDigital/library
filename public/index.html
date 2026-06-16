@@ -85,6 +85,77 @@
   @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
   .fade-in{animation:fadeInUp 0.5s ease forwards}
   .search-wrap{background:rgba(26,31,46,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:28px;max-width:700px;margin:0 auto;backdrop-filter:blur(12px)}
+  .theme-toggle{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;margin-left:8px;font-size:16px;flex-shrink:0}
+  .theme-toggle:hover{background:rgba(255,255,255,0.12)}
+
+  /* ═══ LIGHT MODE ═══ */
+  body.light{background:#f1f5f9;color:#1e293b}
+  body.light ::-webkit-scrollbar-track{background:#f1f5f9}
+  body.light ::-webkit-scrollbar-thumb{background:#cbd5e1}
+  body.light .public-nav{background:rgba(255,255,255,0.95);border-bottom-color:#e2e8f0}
+  body.light .nav-pill{color:#475569}
+  body.light .nav-pill:hover{background:rgba(79,110,247,0.08);color:#4f6ef7;border-color:rgba(79,110,247,0.25)}
+  body.light .nav-pill.active-nav{background:rgba(79,110,247,0.1);color:#4f6ef7;border-color:rgba(79,110,247,0.3)}
+  body.light .theme-toggle{border-color:#e2e8f0;background:#f8fafc;color:#475569}
+  body.light .theme-toggle:hover{background:#e2e8f0}
+  body.light .hero-bg{background:linear-gradient(135deg,#eef2ff 0%,#faf5ff 50%,#f0fdf4 100%) !important;background-color:#f8fafc !important}
+  body.light #bookshelf{background:#dde3ea !important}
+  body.light .book-card{background:#ffffff;border-color:#e2e8f0}
+  body.light .book-card:hover{border-color:#818cf8;box-shadow:0 16px 40px rgba(79,110,247,0.1)}
+  body.light .stat-card{background:#ffffff;border-color:#e2e8f0}
+  body.light .modal{background:#ffffff;border-color:#e2e8f0;box-shadow:0 32px 64px rgba(15,23,42,0.15)}
+  body.light .modal-bg{background:rgba(15,23,42,0.4)}
+  body.light input,body.light select,body.light textarea{background:#ffffff;border-color:#e2e8f0;color:#0f172a}
+  body.light input::placeholder,body.light textarea::placeholder{color:#94a3b8}
+  body.light input:focus,body.light select:focus,body.light textarea:focus{border-color:#4f6ef7}
+  body.light th{color:#64748b;border-bottom-color:#e2e8f0}
+  body.light td{border-bottom-color:#f1f5f9;color:#1e293b}
+  body.light tr:hover td{background:#f8fafc}
+  body.light .sidebar{background:#ffffff;border-right-color:#e2e8f0}
+  body.light .sidebar-link{color:#64748b}
+  body.light .sidebar-link:hover,body.light .sidebar-link.active{background:#4f6ef710;color:#4f6ef7}
+  body.light .admin-content{background:#f8fafc}
+  body.light .badge-red{background:#fee2e2;color:#dc2626}
+  body.light .badge-green{background:#dcfce7;color:#16a34a}
+  body.light .badge-blue{background:#dbeafe;color:#2563eb}
+  body.light .badge-yellow{background:#fef3c7;color:#d97706}
+  body.light .status-aktiv{background:#dcfce7;color:#16a34a}
+  body.light .status-kthyer{background:#dbeafe;color:#2563eb}
+  body.light .status-vonuar{background:#fee2e2;color:#dc2626}
+  body.light .toast{background:#ffffff;box-shadow:0 8px 24px rgba(0,0,0,0.12)}
+  body.light .btn-outline{border-color:#e2e8f0;color:#64748b}
+  body.light .btn-outline:hover{border-color:#4f6ef7;color:#4f6ef7}
+  body.light .search-wrap{background:rgba(255,255,255,0.9);border-color:#e2e8f0}
+  body.light .glass-card{background:rgba(255,255,255,0.8);border-color:#e2e8f0}
+  /* Public page text overrides */
+  body.light #pub-home h1,body.light #pub-history h1,body.light #pub-contact h1{color:#0f172a}
+  body.light #pub-home h2,body.light #pub-home h3{color:#1e293b}
+  body.light #heroSubtext{color:#64748b !important}
+  body.light #historyContent{background:#ffffff !important;border-color:#e2e8f0 !important}
+  body.light #historyText{color:#475569 !important}
+  body.light #histFounded,body.light #histYears,body.light #histBooks{color:#4f6ef7}
+  body.light #contactCards .stat-card div[style*="color:#94a3b8"]{color:#475569}
+  body.light #pubSearchResults>div{background:#f8fafc !important;border:1px solid #e2e8f0}
+  body.light .playfair{color:inherit}
+  body.light [style*="color:#9ca3af"]{color:#64748b !important}
+  body.light [style*="color:#94a3b8"]{color:#475569 !important}
+  body.light [style*="color:#6b7280"]{color:#64748b !important}
+  body.light [style*="color:#4b5563"]{color:#9ca3af !important}
+  body.light [style*="color:#e2e8f0"]{color:#1e293b !important}
+  body.light [style*="background:#1a1f2e"]{background:#ffffff !important}
+  body.light [style*="background:#0d1117"]{background:#f8fafc !important}
+  body.light [style*="background:#111827"]{background:#f1f5f9 !important}
+  body.light [style*="background:#1e2535"]{background:#f1f5f9 !important}
+  body.light [style*="border:1px solid #2d3748"]{border-color:#e2e8f0 !important}
+  body.light [style*="border-bottom:1px solid #2d3748"]{border-bottom-color:#e2e8f0 !important}
+  body.light [style*="border-top:1px solid #2d3748"]{border-top-color:#e2e8f0 !important}
+  body.light [style*="border-left:2px solid #2d3748"]{border-left-color:#e2e8f0 !important}
+  body.light [style*="border-right:1px solid #2d3748"]{border-right-color:#e2e8f0 !important}
+  body.light [style*="border-bottom:1px solid #1e2535"]{border-bottom-color:#f1f5f9 !important}
+  body.light [style*="background:#ffffff05"]{background:#f8fafc !important}
+  body.light [style*="background:rgba(255,255,255,0.06)"]{background:rgba(0,0,0,0.05) !important}
+  body.light [style*="background:rgba(255,255,255,0.1)"]{background:rgba(0,0,0,0.06) !important}
+  body.light [style*="background:rgba(13,17,23,0.95)"]{background:rgba(255,255,255,0.95) !important}
 </style>
 </head>
 <body>
@@ -111,6 +182,7 @@
         <button onclick="showAdmin()" class="btn" style="background:rgba(255,255,255,0.06);color:#9ca3af;border:1px solid rgba(255,255,255,0.1);border-radius:100px;margin-left:10px;font-size:13px;padding:7px 14px">
           <i data-lucide="settings" style="width:13px;height:13px"></i> Admin
         </button>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Ndrysho temën">🌙</button>
       </div>
     </div>
   </nav>
@@ -736,6 +808,27 @@ function closeModal(id) { document.getElementById(id).style.display='none'; }
 
 function initLucide() { if(window.lucide) lucide.createIcons(); }
 
+// ─── THEME ───────────────────────────────────────────────────────────────────
+function applyTheme(mode) {
+  if(mode === 'dark') {
+    document.body.classList.remove('light');
+  } else {
+    document.body.classList.add('light');
+  }
+  const btn = document.getElementById('themeToggle');
+  if(btn) btn.textContent = mode === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', mode);
+}
+function toggleTheme() {
+  const isDark = !document.body.classList.contains('light');
+  applyTheme(isDark ? 'light' : 'dark');
+}
+// Initialize theme (default: light)
+(function(){
+  const saved = localStorage.getItem('theme') || 'light';
+  applyTheme(saved);
+})();
+
 // ─── PUBLIC SITE ─────────────────────────────────────────────────────────────
 let settings = {};
 
@@ -756,14 +849,14 @@ async function loadPublicSite() {
 async function loadBookshelf() {
   try {
     const { books } = await api('GET', '/api/books?limit=30');
-    const titles = ['Kronikë në Gur','Gjenerali i Ushtrisë së Vdekur','Pallati i Ëndrrave','Prilli i Thyer','Dashuri nën Hije','Naim Frashëri','Bagëti e Bujqësi','Fan Noli - Vepra','Retorika','Republika','Fjalori i Gjuhës','Gramatika Shqipe','Kodi Da Vinci','Ferri','100 Vjet Vetmi','Lufta dhe Paqja','Anna Karenina','Krimi dhe Dënimi','Idiot','Plaku dhe Deti','Për kë bien këmbanat','Harry Potter','Princi i Vogël','Ferma e Kafshëve','1984','Qielli i Mesnatës','Biologjia','Fizika','Matematika','Kimia'];
-    const colors = books.length ? books.map(b=>b.cover_color||'#3B82F6') : ['#1E40AF','#7C3AED','#047857','#B45309','#9D174D','#1D4ED8','#065F46','#92400E','#6D28D9','#0F766E','#B91C1C','#1E3A8A','#5B21B6','#064E3B','#78350F','#831843','#134E4A','#1E40AF','#7C3AED','#047857','#B45309','#9D174D','#1D4ED8','#065F46','#92400E','#6D28D9','#0F766E','#B91C1C','#1E3A8A','#5B21B6'];
-    const allColors = [...colors]; while(allColors.length < 30) allColors.push(...colors);
-    const allTitles = [...titles]; while(allTitles.length < 30) allTitles.push(...titles);
-    const heights = [118,136,124,142,112,130,140,108,126,138,128,144,114,122,136,110,132,120,142,116,128,138,112,140,122,134,118,130,142,120];
+    const titles = ['Kronikë në Gur','Gjenerali i Ushtrisë së Vdekur','Pallati i Ëndrrave','Prilli i Thyer','Dashuri nën Hije','Naim Frashëri','Bagëti e Bujqësi','Fan Noli - Vepra','Retorika','Republika','Fjalori i Gjuhës','Gramatika Shqipe','Kodi Da Vinci','Ferri','100 Vjet Vetmi','Lufta dhe Paqja','Anna Karenina','Krimi dhe Dënimi','Idiot','Plaku dhe Deti','Për kë bien këmbanat','Harry Potter','Princi i Vogël','Ferma e Kafshëve','1984','Qielli i Mesnatës','Biologjia','Fizika','Matematika','Kimia','Clean Code','Pragmatic Programmer','Intro to Algorithms'];
+    const colors = books.length ? books.map(b=>b.cover_color||'#3B82F6') : ['#1E40AF','#7C3AED','#047857','#B45309','#9D174D','#1D4ED8','#065F46','#92400E','#6D28D9','#0F766E','#B91C1C','#1E3A8A','#5B21B6','#064E3B','#78350F','#831843','#134E4A','#1E40AF','#7C3AED','#047857','#B45309','#9D174D','#1D4ED8','#065F46','#92400E','#6D28D9','#0F766E','#B91C1C','#1E3A8A','#5B21B6','#0F172A','#1E293B','#134E4A'];
+    const allColors = [...colors]; while(allColors.length < 33) allColors.push(...colors);
+    const allTitles = [...titles]; while(allTitles.length < 33) allTitles.push(...titles);
+    const heights = [118,136,124,142,112,130,140,108,126,138,128,144,114,122,136,110,132,120,142,116,128,138,112,140,122,134,118,130,142,120,126,138,116];
     const row1 = document.getElementById('shelfRow1');
     row1.innerHTML = '';
-    for(let i=0; i<30; i++) {
+    for(let i=0; i<33; i++) {
       const h = heights[i];
       const c = allColors[i];
       const t = (books[i]?.title || allTitles[i]);
